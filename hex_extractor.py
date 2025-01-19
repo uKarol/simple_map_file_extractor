@@ -1,3 +1,5 @@
+import tkinter as tk
+
 class MapFileObjects:
 
     def __init__(self, name, section, location):
@@ -25,10 +27,53 @@ class MapExtractorModel:
         except KeyError:
             return None
 
+class TkView:
+    def setup(self, controller):
+        self.controller = controller
+        self.root = tk.Tk()
+        self.root.geometry("400x400")
+        self.root.title("map_extractor")
+
+
+        self.frame = tk.Frame(self.root)
+        self.frame.pack(fill=tk.BOTH, expand=1)
+        self.entry = tk.Entry(self.frame)
+        self.entry.pack()
+        self.generate_uuid_button = tk.Button(self.frame, text="get address", command=controller.process_new_data)
+        self.generate_uuid_button.pack()        
+        self.label = tk.Label(self.frame, text = "Result")
+        self.label.pack()
+        self.my_string_var = tk.StringVar()
+        self.my_label = tk.Label(self.frame, textvariable= self.my_string_var)
+        self.my_label.pack()
+
+
+        self.my_string_var.set("dupa")
+
+    def show_object(self, addr, object_properties):
+        #(address, name, section, region, location)
+        text = f"address: {hex(addr)} \n    name: {object_properties[0]} \n    section: {object_properties[1]} \n    location: {object_properties[2]}"
+        self.my_string_var.set(text)
+
+    def show_error(self):
+        text = "ADDRESS NOT FOUND"
+        self.my_string_var.set(text)
+
+    def get_data(self):
+        try:
+            addr = int(self.entry.get(), 16)
+            return addr
+        except ValueError:
+            self.my_string_var.set("INVALID VALUE")
+            return None 
+
+    def main_loop(self):
+        self.root.mainloop()
+
 class MapExtractorView:
 
     def __init__(self):
-        pass
+        self.data = None
 
     def setup(self, controller):
         self.controller = controller
@@ -40,12 +85,20 @@ class MapExtractorView:
     def show_error(self):
         print("ADDRESS NOT FOUND")
 
+    def get_data(self):
+        try:
+            addr = int(self.data, 16)
+            return addr
+        except ValueError:
+            print("INVALID VALUE")
+            return None 
+
     def mainloop(self):
         while(True):
-            x = input("write_address: ")
+            self.data = input("write_address: ")
             try:
-                addr = int(x, 16)
-                self.controller.process_new_data(addr)
+                #addr = int(x, 16)
+                self.controller.process_new_data()
             except ValueError:
                 print("INVALID VALUE")
 
@@ -58,7 +111,8 @@ class MapExtractorController:
         self.view = view
         self.view.setup(self)
 
-    def process_new_data(self, addr):
+    def process_new_data(self):
+        addr = self.view.get_data()
         info = self.model.get_obj_by_addr(addr)
         if(info == None):
             self.view.show_error()
@@ -106,11 +160,11 @@ class MapExtractorController:
             self.view.show_object(key, obj_to_disp)
 
     def start(self):
-        self.view.mainloop()
+        self.view.main_loop()
 
 
 
-extractor = MapExtractorController(view = MapExtractorView(), model = MapExtractorModel())
+extractor = MapExtractorController(view = TkView(), model = MapExtractorModel())
 
 
 
