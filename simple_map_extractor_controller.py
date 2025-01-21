@@ -33,19 +33,21 @@ class MapExtractorController:
     def extract_map_file(self, map_file):
         
         substrings = [".text.", ".rodata.", ".bss.", ".data."]
+        reserved_strings = []
         with open(map_file, mode='r') as file:
             lines = file.readlines()
             myiter = iter(lines)
             for line in myiter:
                 if any(word in line for word in substrings):
-                    if not '0x' in line:
-                        #in two lines
-                        line1 = line.split()
-                        line2 = (next(myiter)).split()
-                        self.two_line_split(line1, line2)
-                    else:
+                    splitted_line = line.split()
+                    if len(splitted_line) > 1:
                         #in one line
                         self.one_line_split(line.split())
+                    elif len(splitted_line) == 1:
+                        #in two lines
+                        splitted_line2 = (next(myiter)).split()
+                        self.two_line_split(splitted_line, splitted_line2)
+
 
     def get_all(self):
         keys = self.model.get_all_addrs()
