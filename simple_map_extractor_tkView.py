@@ -1,8 +1,8 @@
 import tkinter as tk
 
-
 class TkView:
-    def setup(self):
+    def setup(self, controller):
+        self.controller = controller
         self.root = tk.Tk()
         self.root.geometry("400x400")
         self.root.title("map_extractor")
@@ -12,7 +12,7 @@ class TkView:
         self.frame.pack(fill=tk.BOTH, expand=1)
         self.entry = tk.Entry(self.frame)
         self.entry.pack()
-        self.generate_uuid_button = tk.Button(self.frame, text="get address")
+        self.generate_uuid_button = tk.Button(self.frame, text="get address", command=controller.process_new_data)
         self.generate_uuid_button.pack()        
         self.label = tk.Label(self.frame, text = "Result")
         self.label.pack()
@@ -34,16 +34,11 @@ class TkView:
 
     def get_data(self):
         try:
-            addr = int(self.data, 16)
+            addr = int(self.entry.get(), 16)
             return addr
         except ValueError:
-            print("INVALID VALUE")
+            self.my_string_var.set("INVALID VALUE")
             return None 
 
-    def main_loop(self):
+    def mainloop(self):
         self.root.mainloop()
-
-dziadostwo = TkView()
-dziadostwo.setup()
-dziadostwo.show_error()
-dziadostwo.main_loop()
