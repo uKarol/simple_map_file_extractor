@@ -9,7 +9,7 @@ class MapExtractorController:
         addr = self.view.get_data()
         info = self.model.get_obj_by_addr(addr)
         if(info == None):
-            self.view.show_error()
+            self.view.show_error("INVALID ADDRESS")
         else:
             self.view.show_object(addr, info)
 
@@ -48,6 +48,12 @@ class MapExtractorController:
                         splitted_line2 = (next(myiter)).split()
                         self.two_line_split(splitted_line, splitted_line2)
 
+    def reload_map_file(self):
+        try:
+            map_file_path = self.view.get_file_location()
+            self.extract_map_file(map_file_path)
+        except:
+            self.view.show_error("problem with map file")
 
     def get_all(self):
         keys = self.model.get_all_addrs()
