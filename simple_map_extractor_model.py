@@ -10,8 +10,12 @@ class MapFileObjects:
 
 class MapExtractorModel:
     
-    def __init__(self):
-        self.objdict = {} 
+    def __init__(self, mem_sections):
+        self.objdict = {}
+        self.sections = mem_sections
+
+    def get_mem_sections(self):
+        return self.sections
     
     def add_obj(self, address, name, section, location):
         self.objdict.update({address: MapFileObjects(name, section, location)})
