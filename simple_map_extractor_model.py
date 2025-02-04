@@ -23,7 +23,6 @@ class MapExtractorModel:
         return self.reserved_words
     
     def add_obj(self, address, name, section, location):
-        #print(f'{address}, {name}, {section}, {location}')
         self.objdict.update({address: MapFileObjects(name, section, location)})
 
     def get_all_addrs(self):

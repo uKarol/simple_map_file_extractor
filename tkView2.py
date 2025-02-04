@@ -2,8 +2,75 @@ import tkinter as tk
 from tkinter.filedialog import askopenfilename
 from tkinter import messagebox
 
+class TextDisplay:
 
-class TkView2:
+    def disp_controls_setup(self):
+        self.dip_ctl_frame = tk.Frame(master=self.result_frame)
+        self.clr_btn = tk.Button(master=self.dip_ctl_frame, command=self.erase_display, text="Clear")
+        self.ctl_lbl = tk.Label(master=self.dip_ctl_frame, text="overwrite")
+        self.ovr_var = tk.BooleanVar()
+        self.ctl_checkbox = tk.Checkbutton(master=self.dip_ctl_frame, variable=self.ovr_var)
+        self.ctl_checkbox.pack(side=tk.LEFT)
+        self.ctl_lbl.pack(side=tk.LEFT)
+        self.clr_btn.pack(side = tk.RIGHT)
+        self.dip_ctl_frame.pack(side = tk.RIGHT)
+
+
+    def __init__(self, title, master, position):
+        self.result_frame = tk.Frame(master)
+        self.result_label = tk.Label(master=self.result_frame, text=title)
+        self.result_text = tk.Text(master=self.result_frame, width=40)
+        self.result_label.pack()
+        self.result_text.pack(expand=1, fill=tk.BOTH)
+        self.disp_controls_setup()
+        self.result_frame.grid(row = 0, column=position, rowspan=2, sticky='news')
+
+    def show_text(self, text):
+        if self.ovr_var.get() == 1:
+            self.erase_display()
+        self.result_text.insert(tk.END, text)
+
+    def erase_display(self):
+        self.result_text.delete("1.0", tk.END)
+
+class Conncetion_Panel:
+    
+    def __init__(self, master, controller):
+
+        self.controller = controller
+
+        self.con_frame = tk.Frame(master)
+        self.port_entry = tk.Entry(self.con_frame)
+        self.port_entry.grid(row=0, column=0)
+        self.port_lbl = tk.Label(self.con_frame, text="PORT COM")
+        self.port_lbl.grid(row=0, column=1)
+
+        self.speed_entry = tk.Entry(self.con_frame)
+        self.speed_entry.grid(row=1, column=0)
+        self.speed_lbl = tk.Label(self.con_frame, text="SPEED")
+        self.speed_lbl.grid(row=1, column=1)
+
+        self.connect_button = tk.Button(self.con_frame, text="CONNECT", command= self.controller.connect)
+        self.connect_button.grid(row=2, column=0)
+        self.disconnect_button = tk.Button(self.con_frame, text="DISCONNECT", command= self.controller.disconnect)
+        self.disconnect_button.grid(row=2, column=1)
+
+        self.con_frame.grid(row=1, column=0)
+
+    def get_connection_params(self):
+        return [self.speed_entry.get(), self.port_entry.get()]
+    
+    
+
+class ControlPanel:
+    
+    def __init__(self, master, position, controller):
+        self.controller = controller
+        self.control_frame = tk.Frame(master)
+        self.setup_file_finder()
+        self.setup_address_entry()
+        self.control_frame.grid(row = position, column=0)
+        
 
     def setup_file_finder(self):
         self.file_finder_frame = tk.Frame(self.control_frame)
@@ -30,64 +97,57 @@ class TkView2:
         self.address_entry.pack(side=tk.LEFT)
         self.address_btn.pack(side=tk.RIGHT)
         self.address_frame.pack()
+    
+    def get_file_path(self):
+        return self.filepath_entry.get()
+    
+    def set_file_path(self, filepath):
+        self.file_string_var.set(filepath)
 
-    def setup_result_display(self):
-        self.result_frame = tk.Frame(master=self.root)
-        self.result_label = tk.Label(master=self.result_frame, text="result")
-        self.result_text = tk.Text(master=self.result_frame)
-        self.result_label.pack()
-        self.result_text.pack(expand=1, fill=tk.BOTH)
-        self.result_frame.pack(expand=1, fill=tk.BOTH)
-        
-    def disp_controls_setup(self):
-        self.dip_ctl_frame = tk.Frame(master=self.control_frame)
-        self.clr_btn = tk.Button(master=self.dip_ctl_frame, command=self.erase_display, text="Clear")
-        self.ctl_lbl = tk.Label(master=self.dip_ctl_frame, text="overwrite")
-        self.ovr_var = tk.BooleanVar()
-        self.ctl_checkbox = tk.Checkbutton(master=self.dip_ctl_frame, variable=self.ovr_var)
-        self.ctl_checkbox.pack(side=tk.LEFT)
-        self.ctl_lbl.pack(side=tk.LEFT)
-        self.clr_btn.pack(side = tk.RIGHT)
-        self.dip_ctl_frame.pack(side = tk.RIGHT)
+    def get_object_address(self): 
+        return self.address_entry.get()
+    
+    def open_file(self):
+        filepath = askopenfilename(
+            filetypes=[("Map Files", "*.map"), ("All Files", "*.*")]
+        )
+        self.set_file_path(filepath)
+        print(filepath)
+
+class TkView2:
 
     def setup(self, controller):
         
         self.controller = controller
         self.root = tk.Tk()
-        self.control_frame = tk.Frame(self.root)
-        self.control_frame.pack(side = tk.LEFT)
-        self.root.geometry("600x400")
+
+        self.root.geometry("850x600")
         self.root.title("map_extractor")
-        self.setup_address_entry()
-        self.setup_file_finder()
-        self.disp_controls_setup()
-        self.setup_result_display()
+        self.control_panel = ControlPanel(self.root, 0, controller)
+        self.result_disp = TextDisplay("result", self.root, 1)
+        self.info_disp = TextDisplay("info", self.root, 2)
+        self.connection = Conncetion_Panel(self.root, controller)
+        self.root.rowconfigure((1,2),weight=1)
 
     def erase_display(self):
-        self.result_text.delete("1.0", tk.END)
+        self.result_disp.erase_display()
 
     def get_file_location(self):
-        return self.filepath_entry.get()
-
-    def open_file(self):
-        filepath = askopenfilename(
-            filetypes=[("Map Files", "*.map"), ("All Files", "*.*")]
-        )
-        self.file_string_var.set(filepath)
-        print(filepath)
+        return self.control_panel.get_file_path()
 
     def show_object(self, addr, object_properties):
-        if self.ovr_var.get() == 1:
-            self.erase_display()
         text = f"address: {hex(addr)} \n    name: {object_properties[0]} \n    section: {object_properties[1]} \n    location: {object_properties[2]} \n"
-        self.result_text.insert(tk.END, text)
+        self.result_disp.show_text(text)
+
+    def show_info_object(self,text):
+        self.info_disp.show_text(text)
 
     def show_error(self, error_desc = ""):
         messagebox.showerror("dziadostwo", error_desc)
 
     def get_data(self):
         try:
-            addr = int(self.address_entry.get(), 16)
+            addr = int(self.control_panel.get_object_address(), 16)
             return addr
         except ValueError:
             return None 
