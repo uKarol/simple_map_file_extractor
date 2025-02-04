@@ -82,8 +82,8 @@ class TkView2:
         text = f"address: {hex(addr)} \n    name: {object_properties[0]} \n    section: {object_properties[1]} \n    location: {object_properties[2]} \n"
         self.result_text.insert(tk.END, text)
 
-    def show_error(self, error_decs = ""):
-        messagebox.showerror("dziadostwo", error_decs)
+    def show_error(self, error_desc = ""):
+        messagebox.showerror("dziadostwo", error_desc)
 
     def get_data(self):
         try:
