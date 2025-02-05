@@ -1,30 +1,37 @@
 from map_file_extractor import map_extractor
 from DTO_test import *
-#from threading import Thread
+from threading import Thread
 import time
+from param_decoder import *
+from serial_decoder import *
+from pyserial_wrapper import *
 
 class MapExtractorController:
 
     def __init__(self, model, view):
         self.model = model
-        #self.thread_active = True
+        self.thread_active = True
         self.view = view
         self.view.setup(self)
         self.hex_extractor_dto = []
-        #self.periodic_thread = Thread(target=self.periodic_refresh, daemon=True) 
+        self.periodic_thread = Thread(target=self.periodic_refresh, daemon=True) 
+        
+        self.connected = False
 
     def periodic_refresh(self):
-        while(self.thread_active):
-            time.sleep(2)
-            t = time.localtime()
-            current_time = time.strftime(" %H:%M:%S", t)
-            self.view.show_info_object(current_time + '\n')
+        decoder = GlobalDecoder()
+        reader = packet_reader(pyserial_wrapper('COM3', 115200))
+        while(True):
+            if(self.connected):
+                (my_packet, data) = reader.receive_packet()
+                ret_val = decoder.decoder(my_packet, data)
+                self.view.show_info_object(ret_val)
 
     def find_object_by_name(self):
         name = self.view.get_object_name()
         info = self.model.get_obj_by_name(name)
         if(info == None):
-            self.view.show_error("INVALID ADDRESS")
+            self.view.show_error("NOT FOUND")
         else:
             self.view.show_object(info[3], info)
 
@@ -32,9 +39,17 @@ class MapExtractorController:
         addr = self.view.get_object_address()
         info = self.model.get_obj_by_addr(addr)
         if(info == None):
-            self.view.show_error("INVALID ADDRESS")
+            self.view.show_error("NOT FOUND")
         else:
             self.view.show_object(addr, info)
+
+    def find_nearest_object(self):
+        reg_addr = self.view.get_reg_address()
+        info = self.model.get_nearest_object(reg_addr)
+        if(info == None):
+            self.view.show_error("NOT FOUND")
+        else:
+            self.view.show_object(info[3], info)
 
     def copy_extracetd_data(self, hex_extractor_dto):
         for item in hex_extractor_dto:
@@ -65,11 +80,12 @@ class MapExtractorController:
             self.view.show_object(key, obj_to_disp)
 
     def start(self):
+        self.periodic_thread.start()
         self.view.mainloop()
 
     def connect(self):
-        pass
+        self.connected = True
 
     def disconnect(self):
-        pass
+        self.connected = False
 

@@ -92,7 +92,7 @@ class ControlPanel:
         self.address_frame = tk.Frame(master = self.control_frame)
         self.address_entry = tk.Entry(master = self.address_frame)
         self.address_btn = tk.Button(master = self.address_frame, text="get", command = self.controller.find_object_by_address)
-        self.address_label = tk.Label(master = self.address_frame, text="object address")
+        self.address_label = tk.Label(master = self.address_frame, text="object by address")
         self.address_label.pack()
         self.address_entry.pack(side=tk.LEFT)
         self.address_btn.pack(side=tk.RIGHT)
@@ -107,6 +107,17 @@ class ControlPanel:
         self.name_btn.pack(side=tk.RIGHT)
         self.name_frame.pack()
 
+        self.reg_frame = tk.Frame(master = self.control_frame)
+        self.reg_entry = tk.Entry(master = self.reg_frame)
+        self.reg_btn = tk.Button(master = self.reg_frame, text="get", command = self.controller.find_nearest_object)
+        self.reg_label = tk.Label(master = self.reg_frame, text="object by LR or PC")
+        self.reg_label.pack()
+        self.reg_entry.pack(side=tk.LEFT)
+        self.reg_btn.pack(side=tk.RIGHT)
+        self.reg_frame.pack()
+
+    def get_reg_address(self):
+        return self.reg_entry.get()
 
     def get_file_path(self):
         return self.filepath_entry.get()
@@ -134,7 +145,7 @@ class TkView2:
         self.controller = controller
         self.root = tk.Tk()
 
-        self.root.geometry("850x600")
+        self.root.geometry("900x600")
         self.root.title("map_extractor")
         self.control_panel = ControlPanel(self.root, 0, controller)
         self.result_disp = TextDisplay("result", self.root, 1)
@@ -157,6 +168,13 @@ class TkView2:
 
     def show_error(self, error_desc = ""):
         messagebox.showerror("dziadostwo", error_desc)
+
+    def get_reg_address(self):
+        try:
+            addr = int(self.control_panel.get_reg_address(), 16)
+            return addr
+        except ValueError:
+            return None 
 
     def get_object_address(self):
         try:
