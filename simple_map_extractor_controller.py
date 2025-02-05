@@ -20,8 +20,16 @@ class MapExtractorController:
             current_time = time.strftime(" %H:%M:%S", t)
             self.view.show_info_object(current_time + '\n')
 
-    def process_new_data(self):
-        addr = self.view.get_data()
+    def find_object_by_name(self):
+        name = self.view.get_object_name()
+        info = self.model.get_obj_by_name(name)
+        if(info == None):
+            self.view.show_error("INVALID ADDRESS")
+        else:
+            self.view.show_object(info[3], info)
+
+    def find_object_by_address(self):
+        addr = self.view.get_object_address()
         info = self.model.get_obj_by_addr(addr)
         if(info == None):
             self.view.show_error("INVALID ADDRESS")
@@ -36,8 +44,8 @@ class MapExtractorController:
 
         mem_sections = self.model.get_mem_sections()
         reserved_words = self.model.get_reserved_words()
-        extractor = map_extractor(mem_sections, reserved_words)
-        return extractor.extract_map_file(map_file)
+        extractor = map_extractor()
+        return extractor.extract_map_file(map_file, mem_sections, reserved_words)
 
     def reload_map_file(self):
         try:

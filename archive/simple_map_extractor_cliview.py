@@ -13,7 +13,7 @@ class MapExtractorCliView:
     def show_error(self):
         print("ADDRESS NOT FOUND")
 
-    def get_data(self):
+    def get_object_address(self):
         try:
             addr = int(self.data, 16)
             return addr
@@ -25,6 +25,6 @@ class MapExtractorCliView:
         while(True):
             self.data = input("write_address: ")
             try:
-                self.controller.process_new_data()
+                self.controller.find_object_by_address()
             except ValueError:
                 print("INVALID VALUE")

@@ -91,13 +91,23 @@ class ControlPanel:
     def setup_address_entry(self):
         self.address_frame = tk.Frame(master = self.control_frame)
         self.address_entry = tk.Entry(master = self.address_frame)
-        self.address_btn = tk.Button(master = self.address_frame, text="get address", command = self.controller.process_new_data)
+        self.address_btn = tk.Button(master = self.address_frame, text="get", command = self.controller.find_object_by_address)
         self.address_label = tk.Label(master = self.address_frame, text="object address")
         self.address_label.pack()
         self.address_entry.pack(side=tk.LEFT)
         self.address_btn.pack(side=tk.RIGHT)
         self.address_frame.pack()
     
+        self.name_frame = tk.Frame(master = self.control_frame)
+        self.name_entry = tk.Entry(master = self.name_frame)
+        self.name_btn = tk.Button(master = self.name_frame, text="get", command = self.controller.find_object_by_name)
+        self.name_label = tk.Label(master = self.name_frame, text="object by name")
+        self.name_label.pack()
+        self.name_entry.pack(side=tk.LEFT)
+        self.name_btn.pack(side=tk.RIGHT)
+        self.name_frame.pack()
+
+
     def get_file_path(self):
         return self.filepath_entry.get()
     
@@ -107,6 +117,9 @@ class ControlPanel:
     def get_object_address(self): 
         return self.address_entry.get()
     
+    def get_object_name(self): 
+        return self.name_entry.get()
+
     def open_file(self):
         filepath = askopenfilename(
             filetypes=[("Map Files", "*.map"), ("All Files", "*.*")]
@@ -145,10 +158,17 @@ class TkView2:
     def show_error(self, error_desc = ""):
         messagebox.showerror("dziadostwo", error_desc)
 
-    def get_data(self):
+    def get_object_address(self):
         try:
             addr = int(self.control_panel.get_object_address(), 16)
             return addr
+        except ValueError:
+            return None 
+        
+    def get_object_name(self):
+        try:
+            name = self.control_panel.get_object_name()
+            return name
         except ValueError:
             return None 
 

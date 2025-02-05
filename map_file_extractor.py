@@ -2,9 +2,8 @@ from DTO_test import *
 
 class map_extractor:
 
-    def __init__(self, mem_sections, reserved_strings):
-        self.sections = mem_sections
-        self.reserved_strings = reserved_strings
+    def __init__(self):
+        pass
 
     def one_line_split(self, line : list, dto_list, map_errors):
         try: 
@@ -28,20 +27,20 @@ class map_extractor:
         except Exception as es:
             map_errors.append(str(es))
 
-    def validate_line(self, line):
-        if any(word in line for word in self.sections):
-            if not any(invalid_str in line for invalid_str in self.reserved_strings ):
+    def validate_line(self, line, mem_sections, reserved_strings):
+        if any(word in line for word in mem_sections):
+            if not any(invalid_str in line for invalid_str in reserved_strings ):
                 return line.split()
         return []
 
-    def extract_map_file(self, map_file):
+    def extract_map_file(self, map_file, mem_sections, reserved_strings):
         map_errors = []
         dto_list = []
         with open(map_file, mode='r') as file:
             lines = file.readlines()
             myiter = iter(lines)
             for line in myiter:
-                splitted_line = self.validate_line(line)
+                splitted_line = self.validate_line(line, mem_sections, reserved_strings)
                 if len(splitted_line) > 1:
                     #in one line
                     self.one_line_split(line.split(), dto_list, map_errors)

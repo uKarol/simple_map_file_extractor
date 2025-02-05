@@ -12,7 +12,7 @@ class TkView:
         self.frame.pack(fill=tk.BOTH, expand=1)
         self.entry = tk.Entry(self.frame)
         self.entry.pack()
-        self.generate_uuid_button = tk.Button(self.frame, text="get address", command=controller.process_new_data)
+        self.generate_uuid_button = tk.Button(self.frame, text="get address", command=controller.find_object_by_address)
         self.generate_uuid_button.pack()        
         self.label = tk.Label(self.frame, text = "Result")
         self.label.pack()
@@ -32,7 +32,7 @@ class TkView:
         text = "ADDRESS NOT FOUND"
         self.my_string_var.set(text)
 
-    def get_data(self):
+    def get_object_address(self):
         try:
             addr = int(self.entry.get(), 16)
             return addr

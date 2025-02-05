@@ -1,18 +1,21 @@
 class MapFileObjects:
 
-    def __init__(self, name, section, location):
+    def __init__(self, name, section, location, address):
             self.name = name
             self.section = section
             self.location = location
+            self.address = address
             
 
     def get_object_info(self):
-        return [self.name, self.section, self.location]
+        return [self.name, self.section, self.location, self.address]
 
 class MapExtractorModel:
     
     def __init__(self, mem_sections, reserved_words):
-        self.objdict = {}
+        self.objdict_addr = {}
+        self.objdict_name = {}
+        self.addr_list = []
         self.sections = mem_sections
         self.reserved_words = reserved_words
 
@@ -23,13 +26,21 @@ class MapExtractorModel:
         return self.reserved_words
     
     def add_obj(self, address, name, section, location):
-        self.objdict.update({address: MapFileObjects(name, section, location)})
+        self.objdict_addr.update({address: MapFileObjects(name, section, location, address)})
+        self.objdict_name.update({name: MapFileObjects(name, section, location, address)})
+        self.addr_list.append(address)
 
     def get_all_addrs(self):
-        return self.objdict.keys()
+        return self.objdict_addr.keys()
+
+    def get_obj_by_name(self, name):
+        try:
+            return self.objdict_name[name].get_object_info()
+        except KeyError:
+            return None
 
     def get_obj_by_addr(self, address):
         try:
-            return self.objdict[address].get_object_info()
+            return self.objdict_addr[address].get_object_info()
         except KeyError:
             return None
