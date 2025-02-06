@@ -81,7 +81,7 @@ class ControlPanel:
         self.filepath_entry = tk.Entry(self.file_finder_frame, textvariable=self.file_string_var)
         self.filepath_entry.pack(side=tk.LEFT)
         self.filepath_btn = tk.Button(self.file_finder_frame, text="...", command=self.open_file)
-        self.reload_btn = tk.Button(self.file_finder_frame, text="reload", command=self.controller.reload_map_file)
+        self.reload_btn = tk.Button(self.file_finder_frame, text="reload", command=self.controller.get_and_reload_map_file)
 
         self.filepath_btn.pack(side=tk.LEFT)
         self.reload_btn.pack(side=tk.RIGHT)
