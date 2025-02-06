@@ -3,24 +3,25 @@ from DTO_test import *
 from threading import Thread
 import time
 from param_decoder import *
-from serial_decoder import *
-from pyserial_wrapper import *
+from GlobalDecoder import *
+
 
 class MapExtractorController:
 
-    def __init__(self, model, view):
+    def __init__(self, model, view, serial_com):
         self.model = model
         self.thread_active = True
         self.view = view
         self.view.setup(self)
         self.hex_extractor_dto = []
-        self.periodic_thread = Thread(target=self.periodic_refresh, daemon=True) 
-        
+        self.periodic_thread = Thread(target=self.process_received_data, daemon=True) 
+        self.serial_com = serial_com
         self.connected = False
 
-    def periodic_refresh(self):
-        decoder = GlobalDecoder()
-        reader = packet_reader(pyserial_wrapper('COM3', 115200))
+    def process_received_data(self):
+        map_getter = MapDetailsGetter(self.model.get_obj_by_addr, self.model.get_nearest_object)
+        decoder = GlobalDecoder(map_getter)
+        reader = packet_reader(self.serial_com)
         while(True):
             if(self.connected):
                 (my_packet, data) = reader.receive_packet()
