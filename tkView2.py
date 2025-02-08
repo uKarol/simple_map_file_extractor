@@ -38,14 +38,15 @@ class Conncetion_Panel:
     def __init__(self, master, controller):
 
         self.controller = controller
-
+        self.port_var = tk.StringVar(value="COM3")
         self.con_frame = tk.Frame(master)
-        self.port_entry = tk.Entry(self.con_frame)
+        self.port_entry = tk.Entry(self.con_frame, textvariable=self.port_var)
         self.port_entry.grid(row=0, column=0)
         self.port_lbl = tk.Label(self.con_frame, text="PORT COM")
         self.port_lbl.grid(row=0, column=1)
 
-        self.speed_entry = tk.Entry(self.con_frame)
+        self.speed_var = tk.StringVar(value="115200")
+        self.speed_entry = tk.Entry(self.con_frame, textvariable=self.speed_var)
         self.speed_entry.grid(row=1, column=0)
         self.speed_lbl = tk.Label(self.con_frame, text="SPEED")
         self.speed_lbl.grid(row=1, column=1)
@@ -152,6 +153,10 @@ class TkView2:
         self.info_disp = TextDisplay("info", self.root, 2)
         self.connection = Conncetion_Panel(self.root, controller)
         self.root.rowconfigure((1,2),weight=1)
+        self.open_file()
+
+    def open_file(self):
+        self.control_panel.open_file()
 
     def erase_display(self):
         self.result_disp.erase_display()
@@ -189,6 +194,10 @@ class TkView2:
             return name
         except ValueError:
             return None 
+        
+        
+    def get_connection_params(self):
+        return self.connection.get_connection_params()
 
     def mainloop(self):
         self.root.mainloop()

@@ -3,7 +3,6 @@ from param_decoder import *
 class MapDetailsGetter:
 
     def __init__(self, decode_address, decode_LR_PC):
-        print("CREATED GETTER")
         self.decode_address = decode_address
         self.decode_LR_PC = decode_LR_PC
 

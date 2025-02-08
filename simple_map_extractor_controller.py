@@ -18,18 +18,18 @@ class MapExtractorController:
         self.serial_com = serial_com
         self.connected = False
 
+        self.map_getter = MapDetailsGetter(self.model.get_obj_by_addr, self.model.get_nearest_object)
+        self.decoder = GlobalHandler(self.map_getter)
+        self.reader = packet_reader(self.serial_com)
+        self.get_and_reload_map_file()
+
     def process_received_data(self):
-        map_getter = MapDetailsGetter(self.model.get_obj_by_addr, self.model.get_nearest_object)
-        decoder = GlobalHandler(map_getter)
-        reader = packet_reader(self.serial_com)
-        while(True):
-            if(self.connected):
-                try:
-                    (my_packet, data) = reader.receive_packet()
-                    ret_val = decoder.decoder(my_packet, data)
-                    self.view.show_info_object(ret_val)
-                except Exception as ex:
-                    self.view.show_error(str(ex))
+        try:
+            (my_packet, data) = self.reader.receive_packet()
+            ret_val = self.decoder.decoder(my_packet, data)
+            self.view.show_info_object(ret_val)
+        except Exception as ex:
+            self.view.show_error(str(ex))
 
     def find_object_by_name(self):
         name = self.view.get_object_name()
@@ -93,12 +93,15 @@ class MapExtractorController:
 
     def connect(self):
         try:
-            self.serial_com.connect('COM3', 115200)
-            self.connected = True
+            [speed, port_com] = self.view.get_connection_params()
+            
+            self.serial_com.connect(port_com, int(speed))
+            self.task_ctl.resume_task()
         except Exception as ex:
             self.view.show_error(str(ex))
 
     def disconnect(self):
+        self.task_ctl.suspend_task()
         self.serial_com.disconnect()
-        self.connected = False
+        
 
