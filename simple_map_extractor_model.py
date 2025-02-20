@@ -35,9 +35,12 @@ class MapExtractorModel:
     
     def get_nearest_object(self, reg_addr):
         myiter = iter(self.addr_list)
+        prev = self.addr_list[0]
         for addr in myiter:
-            if next(myiter) > reg_addr:
-                return self.get_obj_by_addr(addr)
+            if addr > reg_addr:                
+                return self.get_obj_by_addr(prev)
+            prev = addr
+            #next(myiter)
         return None
 
     def get_obj_by_name(self, name):

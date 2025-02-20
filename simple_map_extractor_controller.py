@@ -19,14 +19,14 @@ class MapExtractorController:
         self.connected = False
 
         self.map_getter = MapDetailsGetter(self.model.get_obj_by_addr, self.model.get_nearest_object)
-        self.decoder = GlobalHandler(self.map_getter)
+        self.decoder = WordSequence_protocol_decoder(self.map_getter)
         self.reader = packet_reader(self.serial_com)
         self.get_and_reload_map_file()
 
     def process_received_data(self):
         try:
             (my_packet, data) = self.reader.receive_packet()
-            ret_val = self.decoder.decoder(my_packet, data)
+            ret_val = self.decoder.packet_processing(my_packet, data)
             self.view.show_info_object(ret_val)
         except Exception as ex:
             self.view.show_error(str(ex))

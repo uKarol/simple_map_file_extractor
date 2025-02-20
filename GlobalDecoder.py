@@ -20,21 +20,31 @@ class MapDetailsGetter:
     
 class PredefinedHandler:
 
-    def __init__(self, map_getter):
+    def __init__(self, map_getter): 
         self.map_getter = map_getter
 
-    def param_0_handler(self, packet_info:Packet, packet_data):
-        ret_val = str(packet_data, 'UTF-8') + '\n'
+    def FUNCTION_ENTRY_handler(self, packet_data):
+        ret_val = f'function: {self.map_getter.decode_LR_PC(packet_data)[0]} entry \n'
+        return ret_val
+    
+    def FUNCTION_EXIT_handler(self, packet_data):
+        ret_val = f'function: {self.map_getter.decode_LR_PC(packet_data)[0]} exit \n'
         return ret_val
 
-    def param_1_handler(self, packet_info:Packet, packet_data):
-        reg_value = int.from_bytes(packet_data)
-        ret_val = f'function called by {self.map_getter.decode_LR_PC(reg_value)}'
-        return ret_val
+    def FUNCTION_RETURN_handler(self, packet_data):
+        return f"ret_val: {packet_data} \n"
 
-    def param_2_handler(self, packet_info:Packet, packet_data):
-        ptr_value = int.from_bytes(packet_data, byteorder='little')
-        ret_val = f'object name: {self.map_getter.decode_addr(ptr_value-1) }\n'
+    def LINK_REGISTER_handler(self, packet_data):
+        ret_val = f'function called by: {self.map_getter.decode_LR_PC(packet_data)[0]} \n'
+        return ret_val
+	
+    def FUNCTION_POINTER_handler(self, packet_data):
+        print(packet_data)
+        ret_val = f'function by pointer: {self.map_getter.decode_addr(packet_data-1) }\n'
+        return ret_val
+	
+    def VARIABLE_POINTER_handler(self, packet_data):
+        ret_val = f'variable by pointer: {self.map_getter.decode_addr(packet_data) }\n'
         return ret_val
 
 
@@ -45,19 +55,60 @@ class GlobalHandler:
         self.predefined_methods = self.get_predefined_methods(PredefinedHandler)
 
     def get_predefined_methods(self, handler_class):
-        found_methods = [meth for meth in handler_class.__dict__ if callable( getattr(handler_class, meth) )]
+        found_methods = [meth for meth in handler_class.__dict__ if callable( getattr(handler_class, meth) )and not meth.startswith('__') ]
         return found_methods
 
     def default_handler(self, packet_info:Packet, packet_data):
-        ret_val = f'cannot decode \nparam id: {packet_info.param} \nraw data {packet_data} \n'
+        ret_val = f'cannot decode \nparam id: {packet_info} \nraw data {packet_data} \n'
         return ret_val
 
-    def decoder(self, packet_info:Packet, packet_data):
-        method_name = f'param_{packet_info.param}_handler'
+    def decode(self, packet_info:Packet, packet_data):
+        method_name = self.predefined_methods[packet_info]
         ret_val : str
         if method_name in self.predefined_methods:
             handler = getattr(PredefinedHandler, method_name)
-            ret_val = handler(self.predefined_handler, packet_info, packet_data)
+            ret_val = handler(self.predefined_handler, packet_data)
         else: 
             ret_val = self.default_handler(packet_info, packet_data)
         return ret_val
+
+class WordSequence_Unit(cstruct.MemCStruct):
+    __byte_order__ = cstruct.LITTLE_ENDIAN
+    __def__ = """
+        struct {
+            uint8_t id;
+            uint32_t value;
+        }
+    """
+
+class WordSequence_Frame(cstruct.MemCStruct):
+    __byte_order__ = cstruct.BIG_ENDIAN
+    __def__ = """
+
+    typedef struct WordSequence_Unit WordSequence_Unit;
+    
+        struct {
+            WordSequence_Unit x[];
+        }
+    """
+
+    def set_length(self, length):
+        self.set_flexible_array_length(length)
+
+class WordSequence_protocol_decoder:
+
+    def __init__(self, map_getter):
+        self.decoder = GlobalHandler(map_getter)
+
+    def packet_processing(self, info : Packet, packet : bytes):
+        number_of_params = info.datasize//5
+        WordSequence_frame = WordSequence_Frame()
+        WordSequence_frame.set_length(number_of_params)
+        WordSequence_frame.unpack(packet)
+        if(number_of_params == 1):
+            return self.decoder.decode(WordSequence_frame.x.id, WordSequence_frame.x.value)
+        else:
+            ret_val = ""
+            for i in range(0, number_of_params):
+                ret_val += self.decoder.decode(WordSequence_frame.x[i].id, WordSequence_frame.x[i].value)
+            return ret_val
