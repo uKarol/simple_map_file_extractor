@@ -22,20 +22,22 @@ class PredefinedHandler:
 
     def __init__(self, map_getter): 
         self.map_getter = map_getter
-
+        self.indent = 0
     def FUNCTION_ENTRY_handler(self, packet_data):
-        ret_val = f'function: {self.map_getter.decode_LR_PC(packet_data)[0]} entry \n'
+        ret_val = "|"+"-"*self.indent + f'{self.map_getter.decode_LR_PC(packet_data)[0]} entry \n'
+        self.indent = self.indent+1
         return ret_val
     
     def FUNCTION_EXIT_handler(self, packet_data):
-        ret_val = f'function: {self.map_getter.decode_LR_PC(packet_data)[0]} exit \n'
+        self.indent = self.indent-1
+        ret_val = "|"+"-"*self.indent +  f'{self.map_getter.decode_LR_PC(packet_data)[0]} exit \n'
         return ret_val
 
     def FUNCTION_RETURN_handler(self, packet_data):
         return f"ret_val: {packet_data} \n"
 
     def LINK_REGISTER_handler(self, packet_data):
-        ret_val = f'function called by: {self.map_getter.decode_LR_PC(packet_data)[0]} \n'
+        ret_val = "|"+"-"*self.indent +  f'called by: {self.map_getter.decode_LR_PC(packet_data)[0]} \n'
         return ret_val
 	
     def FUNCTION_POINTER_handler(self, packet_data):

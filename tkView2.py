@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter.filedialog import askopenfilename
 from tkinter import messagebox
+from tkinter import scrolledtext
 
 class TextDisplay:
 
@@ -16,10 +17,10 @@ class TextDisplay:
         self.dip_ctl_frame.pack(side = tk.RIGHT)
 
 
-    def __init__(self, title, master, position):
+    def __init__(self, title, master, position, width):
         self.result_frame = tk.Frame(master)
         self.result_label = tk.Label(master=self.result_frame, text=title)
-        self.result_text = tk.Text(master=self.result_frame, width=40)
+        self.result_text = scrolledtext.ScrolledText(master=self.result_frame, width=width)
         self.result_label.pack()
         self.result_text.pack(expand=1, fill=tk.BOTH)
         self.disp_controls_setup()
@@ -146,14 +147,14 @@ class TkView2:
         self.controller = controller
         self.root = tk.Tk()
 
-        self.root.geometry("900x600")
+        self.root.geometry("1000x600")
         self.root.title("map_extractor")
         self.control_panel = ControlPanel(self.root, 0, controller)
-        self.result_disp = TextDisplay("result", self.root, 1)
-        self.info_disp = TextDisplay("info", self.root, 2)
+        self.result_disp = TextDisplay("result", self.root, 1, 40)
+        self.info_disp = TextDisplay("info", self.root, 2, 60)
         self.connection = Conncetion_Panel(self.root, controller)
         self.root.rowconfigure((1,2),weight=1)
-        self.open_file()
+        
 
     def open_file(self):
         self.control_panel.open_file()
@@ -200,4 +201,5 @@ class TkView2:
         return self.connection.get_connection_params()
 
     def mainloop(self):
+        self.root.after(1, self.open_file)
         self.root.mainloop()

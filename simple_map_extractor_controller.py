@@ -1,10 +1,11 @@
 from map_file_extractor import map_extractor
 from DTO_test import *
-
+import serial
 from param_decoder import *
 from GlobalDecoder import *
-
+import sys
 from thread_interface import *
+import traceback 
 
 class MapExtractorController:
 
@@ -28,8 +29,20 @@ class MapExtractorController:
             (my_packet, data) = self.reader.receive_packet()
             ret_val = self.decoder.packet_processing(my_packet, data)
             self.view.show_info_object(ret_val)
-        except Exception as ex:
-            self.view.show_error(str(ex))
+
+        except TypeError as ex:
+            trash, trash2, tb = sys.exc_info()
+            self.view.show_error("TypeError "+ str(ex)+ str(traceback.format_tb(tb)))
+            self.task_ctl.suspend_task()
+        except serial.serialutil.SerialException as ex:
+            self.view.show_error("SerialException \n"+ str(ex))
+        # except Exception as ex:
+        #     trash, trash2, tb = sys.exc_info()
+        #     print(ex)
+        #     print(ex.__traceback__)
+        #     print(ex.__traceback__.tb_frame)
+        #     self.view.show_error(str(ex)+ str(traceback.format_tb(tb)))
+        #     self.task_ctl.suspend_task()
 
     def find_object_by_name(self):
         name = self.view.get_object_name()
@@ -67,6 +80,7 @@ class MapExtractorController:
         return extractor.extract_map_file(map_file, mem_sections, reserved_words)
 
     def get_and_reload_map_file(self):
+        self.model.clear_model()
         map_file_path = self.view.get_file_location()
         self.reload_map_file(map_file_path)
 
@@ -77,8 +91,9 @@ class MapExtractorController:
             self.copy_extracetd_data(extractor_dto)
             if(len(map_parse_errors) > 0):
                 self.view.show_error(str(map_parse_errors))
-        except Exception as ex:
-            self.view.show_error(str(ex))
+        except FileNotFoundError as ex:
+            trash, trash2, tb = sys.exc_info()
+            self.view.show_error("FileNotFoundError \n"+ str(ex) + str(traceback.format_tb(tb)))
 
 
     def get_all(self):
@@ -89,6 +104,8 @@ class MapExtractorController:
 
     def start(self):
         self.task_ctl.start_task()
+        #self.view.open_file()
+        
         self.view.mainloop()
 
     def connect(self):
@@ -97,8 +114,8 @@ class MapExtractorController:
             
             self.serial_com.connect(port_com, int(speed))
             self.task_ctl.resume_task()
-        except Exception as ex:
-            self.view.show_error(str(ex))
+        except serial.serialutil.SerialException as ex:
+            self.view.show_error("SerialException \n"+ str(ex))
 
     def disconnect(self):
         self.task_ctl.suspend_task()

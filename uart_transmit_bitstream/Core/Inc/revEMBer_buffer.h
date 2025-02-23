@@ -41,6 +41,6 @@ buffer_status_t buffer_put(revember_buffer *buffer, uint8_t *data, uint16_t size
  */
 buffer_status_t buffer_get(revember_buffer *buffer, uint8_t *data, uint16_t size);
 
-uint16_t buffer_get_size(revember_buffer *buffer);
+uint32_t buffer_get_size(revember_buffer *buffer);
 
 #endif /* INC_REVEMBER_BUFFER_H_ */

@@ -77,9 +77,6 @@ void revEMBer_transmit_interface_active();
 void revEMBer_transmit_interface_inactive();
 void revember_logger_init(tx_function tx_function_f);
 void revEMBer_WSEQ(uint8_t arg_num, uint16_t scenario_id, ...);
-void revEMBer_send_info_frame(uint16_t scenario, uint16_t message_type, uint16_t size);
-void revEMBer_send_pointer(uint16_t scenario, void *ptr);
-void revEMBer_send_text(uint16_t scenario, uint8_t *text, uint8_t size);
-void revEMBer_experimental();
+//void revEMBer_send_text(uint16_t scenario, uint8_t *text, uint8_t size);
 
 #endif /* INC_REVEMBER_H_ */
