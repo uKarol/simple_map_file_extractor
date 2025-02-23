@@ -22,7 +22,6 @@ class MapExtractorController:
         self.map_getter = MapDetailsGetter(self.model.get_obj_by_addr, self.model.get_nearest_object)
         self.decoder = WordSequence_protocol_decoder(self.map_getter)
         self.reader = packet_reader(self.serial_com)
-        self.get_and_reload_map_file()
 
     def process_received_data(self):
         try:
@@ -36,13 +35,8 @@ class MapExtractorController:
             self.task_ctl.suspend_task()
         except serial.serialutil.SerialException as ex:
             self.view.show_error("SerialException \n"+ str(ex))
-        # except Exception as ex:
-        #     trash, trash2, tb = sys.exc_info()
-        #     print(ex)
-        #     print(ex.__traceback__)
-        #     print(ex.__traceback__.tb_frame)
-        #     self.view.show_error(str(ex)+ str(traceback.format_tb(tb)))
-        #     self.task_ctl.suspend_task()
+            self.task_ctl.suspend_task()
+
 
     def find_object_by_name(self):
         name = self.view.get_object_name()
@@ -104,8 +98,6 @@ class MapExtractorController:
 
     def start(self):
         self.task_ctl.start_task()
-        #self.view.open_file()
-        
         self.view.mainloop()
 
     def connect(self):

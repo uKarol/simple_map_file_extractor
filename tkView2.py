@@ -147,7 +147,7 @@ class TkView2:
         self.controller = controller
         self.root = tk.Tk()
 
-        self.root.geometry("1000x600")
+        self.root.geometry("1050x600")
         self.root.title("map_extractor")
         self.control_panel = ControlPanel(self.root, 0, controller)
         self.result_disp = TextDisplay("result", self.root, 1, 40)
@@ -196,10 +196,13 @@ class TkView2:
         except ValueError:
             return None 
         
-        
+    def initial_open(self):
+        self.open_file()
+        self.controller.get_and_reload_map_file()
+
     def get_connection_params(self):
         return self.connection.get_connection_params()
 
     def mainloop(self):
-        self.root.after(1, self.open_file)
+        self.root.after(1, self.initial_open)
         self.root.mainloop()
