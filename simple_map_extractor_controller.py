@@ -105,7 +105,9 @@ class MapExtractorController:
             [speed, port_com] = self.view.get_connection_params()
             
             self.serial_com.connect(port_com, int(speed))
+            self.decoder.reset_indentation()
             self.task_ctl.resume_task()
+            
         except serial.serialutil.SerialException as ex:
             self.view.show_error("SerialException \n"+ str(ex))
 

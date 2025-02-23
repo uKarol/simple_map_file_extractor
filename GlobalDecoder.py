@@ -23,6 +23,7 @@ class PredefinedHandler:
     def __init__(self, map_getter): 
         self.map_getter = map_getter
         self.indent = 0
+
     def FUNCTION_ENTRY_handler(self, packet_data):
         ret_val = "|"+"-"*self.indent + f'{self.map_getter.decode_LR_PC(packet_data)[0]} entry \n'
         self.indent = self.indent+1
@@ -49,12 +50,17 @@ class PredefinedHandler:
         ret_val = f'variable by pointer: {self.map_getter.decode_addr(packet_data) }\n'
         return ret_val
 
+    def reset_indentation(self):
+        self.indent = 0
 
 class GlobalHandler:
 
     def __init__(self, map_getter):
         self.predefined_handler = PredefinedHandler(map_getter)
         self.predefined_methods = self.get_predefined_methods(PredefinedHandler)
+
+    def reset_indentation(self):
+        self.predefined_handler.reset_indentation()
 
     def get_predefined_methods(self, handler_class):
         found_methods = [meth for meth in handler_class.__dict__ if callable( getattr(handler_class, meth) )and not meth.startswith('__') ]
@@ -101,6 +107,9 @@ class WordSequence_protocol_decoder:
 
     def __init__(self, map_getter):
         self.decoder = GlobalHandler(map_getter)
+
+    def reset_indentation(self):
+       self.decoder.reset_indentation()
 
     def packet_processing(self, info : Packet, packet : bytes):
         number_of_params = info.datasize//5
