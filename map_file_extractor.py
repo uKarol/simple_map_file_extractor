@@ -12,7 +12,8 @@ class map_extractor:
             location = line[3]
             section = full_name[1]
             name = full_name[2]
-            dto_list.append(UserDTO_data(addr, name, section, location))
+            if(addr != 0):
+                dto_list.append(UserDTO_data(addr, name, section, location))
         except Exception as es:
             map_errors.append(str(es))
 
@@ -23,7 +24,8 @@ class map_extractor:
             location = line2[2]
             section = full_name[1]
             name = full_name[2]
-            dto_list.append(UserDTO_data(addr, name, section, location))
+            if(addr != 0):
+                dto_list.append(UserDTO_data(addr, name, section, location))
         except Exception as es:
             map_errors.append(str(es))
 

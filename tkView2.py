@@ -1,29 +1,39 @@
 import tkinter as tk
-from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import askopenfilename, asksaveasfile
 from tkinter import messagebox
+from tkinter import scrolledtext
 
 class TextDisplay:
 
     def disp_controls_setup(self):
         self.dip_ctl_frame = tk.Frame(master=self.result_frame)
         self.clr_btn = tk.Button(master=self.dip_ctl_frame, command=self.erase_display, text="Clear")
+        self.save_btn = tk.Button(master=self.dip_ctl_frame, command=self.save_to_file, text="save to file")
         self.ctl_lbl = tk.Label(master=self.dip_ctl_frame, text="overwrite")
         self.ovr_var = tk.BooleanVar()
         self.ctl_checkbox = tk.Checkbutton(master=self.dip_ctl_frame, variable=self.ovr_var)
         self.ctl_checkbox.pack(side=tk.LEFT)
         self.ctl_lbl.pack(side=tk.LEFT)
         self.clr_btn.pack(side = tk.RIGHT)
+        self.save_btn.pack(side = tk.RIGHT)
         self.dip_ctl_frame.pack(side = tk.RIGHT)
 
 
-    def __init__(self, title, master, position):
+    def __init__(self, title, master, position, width):
         self.result_frame = tk.Frame(master)
         self.result_label = tk.Label(master=self.result_frame, text=title)
-        self.result_text = tk.Text(master=self.result_frame, width=40)
+        self.result_text = scrolledtext.ScrolledText(master=self.result_frame, width=width)
         self.result_label.pack()
         self.result_text.pack(expand=1, fill=tk.BOTH)
         self.disp_controls_setup()
         self.result_frame.grid(row = 0, column=position, rowspan=2, sticky='news')
+
+    def save_to_file(self):
+        files = [('All Files', '*.*'),   
+            ('Text Document', '*.txt')] 
+        file = asksaveasfile(filetypes = files, defaultextension = files)
+        file_content = self.result_text.get("1.0", tk.END)
+        file.writelines(file_content)
 
     def show_text(self, text):
         if self.ovr_var.get() == 1:
@@ -38,14 +48,15 @@ class Conncetion_Panel:
     def __init__(self, master, controller):
 
         self.controller = controller
-
+        self.port_var = tk.StringVar(value="COM3")
         self.con_frame = tk.Frame(master)
-        self.port_entry = tk.Entry(self.con_frame)
+        self.port_entry = tk.Entry(self.con_frame, textvariable=self.port_var)
         self.port_entry.grid(row=0, column=0)
         self.port_lbl = tk.Label(self.con_frame, text="PORT COM")
         self.port_lbl.grid(row=0, column=1)
 
-        self.speed_entry = tk.Entry(self.con_frame)
+        self.speed_var = tk.StringVar(value="115200")
+        self.speed_entry = tk.Entry(self.con_frame, textvariable=self.speed_var)
         self.speed_entry.grid(row=1, column=0)
         self.speed_lbl = tk.Label(self.con_frame, text="SPEED")
         self.speed_lbl.grid(row=1, column=1)
@@ -81,7 +92,7 @@ class ControlPanel:
         self.filepath_entry = tk.Entry(self.file_finder_frame, textvariable=self.file_string_var)
         self.filepath_entry.pack(side=tk.LEFT)
         self.filepath_btn = tk.Button(self.file_finder_frame, text="...", command=self.open_file)
-        self.reload_btn = tk.Button(self.file_finder_frame, text="reload", command=self.controller.reload_map_file)
+        self.reload_btn = tk.Button(self.file_finder_frame, text="reload", command=self.controller.get_and_reload_map_file)
 
         self.filepath_btn.pack(side=tk.LEFT)
         self.reload_btn.pack(side=tk.RIGHT)
@@ -92,7 +103,7 @@ class ControlPanel:
         self.address_frame = tk.Frame(master = self.control_frame)
         self.address_entry = tk.Entry(master = self.address_frame)
         self.address_btn = tk.Button(master = self.address_frame, text="get", command = self.controller.find_object_by_address)
-        self.address_label = tk.Label(master = self.address_frame, text="object address")
+        self.address_label = tk.Label(master = self.address_frame, text="object by address")
         self.address_label.pack()
         self.address_entry.pack(side=tk.LEFT)
         self.address_btn.pack(side=tk.RIGHT)
@@ -107,6 +118,17 @@ class ControlPanel:
         self.name_btn.pack(side=tk.RIGHT)
         self.name_frame.pack()
 
+        self.reg_frame = tk.Frame(master = self.control_frame)
+        self.reg_entry = tk.Entry(master = self.reg_frame)
+        self.reg_btn = tk.Button(master = self.reg_frame, text="get", command = self.controller.find_nearest_object)
+        self.reg_label = tk.Label(master = self.reg_frame, text="object by LR or PC")
+        self.reg_label.pack()
+        self.reg_entry.pack(side=tk.LEFT)
+        self.reg_btn.pack(side=tk.RIGHT)
+        self.reg_frame.pack()
+
+    def get_reg_address(self):
+        return self.reg_entry.get()
 
     def get_file_path(self):
         return self.filepath_entry.get()
@@ -134,13 +156,17 @@ class TkView2:
         self.controller = controller
         self.root = tk.Tk()
 
-        self.root.geometry("850x600")
+        self.root.geometry("1050x600")
         self.root.title("map_extractor")
         self.control_panel = ControlPanel(self.root, 0, controller)
-        self.result_disp = TextDisplay("result", self.root, 1)
-        self.info_disp = TextDisplay("info", self.root, 2)
+        self.result_disp = TextDisplay("result", self.root, 1, 40)
+        self.info_disp = TextDisplay("info", self.root, 2, 60)
         self.connection = Conncetion_Panel(self.root, controller)
         self.root.rowconfigure((1,2),weight=1)
+        
+
+    def open_file(self):
+        self.control_panel.open_file()
 
     def erase_display(self):
         self.result_disp.erase_display()
@@ -158,6 +184,13 @@ class TkView2:
     def show_error(self, error_desc = ""):
         messagebox.showerror("dziadostwo", error_desc)
 
+    def get_reg_address(self):
+        try:
+            addr = int(self.control_panel.get_reg_address(), 16)
+            return addr
+        except ValueError:
+            return None 
+
     def get_object_address(self):
         try:
             addr = int(self.control_panel.get_object_address(), 16)
@@ -171,6 +204,14 @@ class TkView2:
             return name
         except ValueError:
             return None 
+        
+    def initial_open(self):
+        self.open_file()
+        self.controller.get_and_reload_map_file()
+
+    def get_connection_params(self):
+        return self.connection.get_connection_params()
 
     def mainloop(self):
+        self.root.after(1, self.initial_open)
         self.root.mainloop()

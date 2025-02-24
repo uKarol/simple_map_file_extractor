@@ -25,13 +25,29 @@ class MapExtractorModel:
     def get_reserved_words(self):
         return self.reserved_words
     
+    def clear_model(self):
+        self.objdict_addr = {}
+        self.objdict_name = {}
+        self.addr_list = []    
+
     def add_obj(self, address, name, section, location):
+        print(f"obj_added {hex(address)}, {name}")
         self.objdict_addr.update({address: MapFileObjects(name, section, location, address)})
         self.objdict_name.update({name: MapFileObjects(name, section, location, address)})
         self.addr_list.append(address)
 
     def get_all_addrs(self):
         return self.objdict_addr.keys()
+    
+    def get_nearest_object(self, reg_addr):
+        #myiter = iter(self.addr_list)
+        prev = self.addr_list[0]
+        for addr in self.addr_list:
+            if addr > reg_addr:                
+                return self.get_obj_by_addr(prev)
+            prev = addr
+            #next(myiter)
+        return None
 
     def get_obj_by_name(self, name):
         try:
