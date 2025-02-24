@@ -35,19 +35,13 @@
 		}
 
 typedef void (*tx_function)(uint8_t *data, uint16_t size);
-typedef enum
-{
-	GENERIC_TEXT_MESSAGE,
-	LINK_REG_DECODE,
-	POINTER_DECODE,
-};
 
 typedef enum
 {
 	TEXT_MESSAGE = 0,
 	WSEQ_MESSAGE,
 	MEMORY_DUMP_MESSAGE,
-};
+}revEMBer_message_type;
 
 typedef enum
 {
@@ -62,7 +56,7 @@ typedef enum
 typedef enum
 {
 	SCENARION_DBG_0,
-};
+}revEMBer_scenarios_t;
 
 typedef struct
 {

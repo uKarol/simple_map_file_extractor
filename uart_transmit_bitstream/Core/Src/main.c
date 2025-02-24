@@ -116,14 +116,13 @@ int main(void)
   uint8_t size = 0;
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  //uint8_t text[] = "IFM - fabryka kabli z wypizdowa";
-  //logging_experimental();
+
   while (1)
   {
 
     /* USER CODE END WHILE */
 	  size++;
-	  //logging_DMSK(1, 0, FUNCTION_POINTER, main);
+
 
 	  HAL_Delay(1000);
     /* USER CODE BEGIN 3 */
@@ -139,7 +138,6 @@ int main(void)
 
 void SystemClock_Config(void)
 {
-  REVEMBER_FUNCTION_ENTRY();
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
@@ -178,7 +176,6 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  REVEMBER_FUNCTION_EXIT();
 
 }
 
@@ -189,7 +186,6 @@ void SystemClock_Config(void)
   */
 static void MX_GPIO_Init(void)
 {
-	REVEMBER_FUNCTION_ENTRY();
 /* USER CODE BEGIN MX_GPIO_Init_1 */
 /* USER CODE END MX_GPIO_Init_1 */
 
@@ -201,7 +197,6 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
-  REVEMBER_FUNCTION_EXIT();
 }
 
 /* USER CODE BEGIN 4 */
