@@ -85,11 +85,13 @@ void revEMBer_send_bytes(uint8_t *bytes_to_send, uint16_t size)
 {
 	if((transmit_interface_status == TRANSMIT_INTERFACE_ACTIVE) && (revember_check_mcu_mode() == IN_THREAD))
 	{
+		revember_logger_status = REVEMBER_LOGGER_SUSPENDED;
 		if(0 > buffer_get_size(logging_buffer))
 		{
 			transimt_buffer_flush();
 		}
 		logging_tx_fun(bytes_to_send, size);
+		revember_logger_status = REVEMBER_LOGGER_ACTIVE;
 	}
 	else
 	{

@@ -6,6 +6,7 @@ from GlobalDecoder import *
 import sys
 from thread_interface import *
 import traceback 
+import struct
 
 class MapExtractorController:
 
@@ -36,7 +37,10 @@ class MapExtractorController:
         except serial.serialutil.SerialException as ex:
             self.view.show_error("SerialException \n"+ str(ex))
             self.task_ctl.suspend_task()
-
+        except struct.error as ex:
+            trash, trash2, tb = sys.exc_info()
+            self.view.show_error("StructError "+ str(ex)+ str(traceback.format_tb(tb)))
+            self.task_ctl.suspend_task()
 
     def find_object_by_name(self):
         name = self.view.get_object_name()

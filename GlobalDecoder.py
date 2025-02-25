@@ -12,10 +12,13 @@ class MapDetailsGetter:
             ret_val = ret_val[0]
         return ret_val
     
-    def decode_LR_PC(self, address):
+    def decode_LRPC(self, address):
         ret_val = self.decode_LR_PC(address)
         if(ret_val != None):
             ret_val = ret_val[0]
+            #print(ret_val[0])
+        else:
+            print(hex(address))
         return ret_val
     
 class PredefinedHandler:
@@ -25,13 +28,13 @@ class PredefinedHandler:
         self.indent = 0
 
     def FUNCTION_ENTRY_handler(self, packet_data):
-        ret_val = "|"+"-"*self.indent + f'{self.map_getter.decode_LR_PC(packet_data)[0]} entry \n'
-        self.indent = self.indent+1
+        ret_val = "|"+"-"*self.indent + f'{self.map_getter.decode_LRPC(packet_data)} entry \n'
+        #self.indent = self.indent+1
         return ret_val
     
     def FUNCTION_EXIT_handler(self, packet_data):
-        self.indent = self.indent-1
-        ret_val = "|"+"-"*self.indent +  f'{self.map_getter.decode_LR_PC(packet_data)[0]} exit \n'
+        #self.indent = self.indent-1
+        ret_val = "|"+"-"*self.indent +  f'{self.map_getter.decode_LRPC(packet_data)} exit \n'
         return ret_val
 
     def FUNCTION_RETURN_handler(self, packet_data):
@@ -71,12 +74,14 @@ class GlobalHandler:
         return ret_val
 
     def decode(self, packet_info:Packet, packet_data):
-        method_name = self.predefined_methods[packet_info]
-        ret_val : str
-        if method_name in self.predefined_methods:
+        try:
+            method_name = self.predefined_methods[packet_info]
+            ret_val : str
+            #if method_name in self.predefined_methods:
             handler = getattr(PredefinedHandler, method_name)
             ret_val = handler(self.predefined_handler, packet_data)
-        else: 
+            #else: 
+        except IndexError as ex:
             ret_val = self.default_handler(packet_info, packet_data)
         return ret_val
 

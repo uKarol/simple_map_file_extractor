@@ -1,3 +1,9 @@
+/* 
+THIS FILE HAS ADDED DEBUG INFORMATIONS 
+ revEMBer projct in github: https://github.com/uKarol/revEMBer 
+jefvcoe oefpm d actmdhsae
+*/
+#include "revEMBer.h"
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
@@ -58,7 +64,9 @@ static void MX_GPIO_Init(void);
 /* USER CODE BEGIN 0 */
 void tx_f(uint8_t *bytes_to_send, uint16_t size)
 {
-	HAL_UART_Transmit(hcom_uart, bytes_to_send, size, 100);
+REVEMBER_FUNCTION_ENTRY() 
+	HAL_UART_Transmit(hcom_uart, bytes_to_send, size, 1000);
+REVEMBER_FUNCTION_EXIT() 
 }
 /* USER CODE END 0 */
 
@@ -68,6 +76,7 @@ void tx_f(uint8_t *bytes_to_send, uint16_t size)
   */
 int main(void)
 {
+REVEMBER_FUNCTION_ENTRY() 
 
   /* USER CODE BEGIN 1 */
 
@@ -128,6 +137,7 @@ int main(void)
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
+REVEMBER_FUNCTION_EXIT() 
 }
 
 /**
@@ -138,6 +148,7 @@ int main(void)
 
 void SystemClock_Config(void)
 {
+REVEMBER_FUNCTION_ENTRY() 
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
@@ -177,6 +188,7 @@ void SystemClock_Config(void)
     Error_Handler();
   }
 
+REVEMBER_FUNCTION_EXIT() 
 }
 
 /**
@@ -186,6 +198,7 @@ void SystemClock_Config(void)
   */
 static void MX_GPIO_Init(void)
 {
+REVEMBER_FUNCTION_ENTRY() 
 /* USER CODE BEGIN MX_GPIO_Init_1 */
 /* USER CODE END MX_GPIO_Init_1 */
 
@@ -197,6 +210,7 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
+REVEMBER_FUNCTION_EXIT() 
 }
 
 /* USER CODE BEGIN 4 */
@@ -209,6 +223,7 @@ static void MX_GPIO_Init(void)
   */
 void Error_Handler(void)
 {
+REVEMBER_FUNCTION_ENTRY() 
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
@@ -216,6 +231,7 @@ void Error_Handler(void)
   {
   }
   /* USER CODE END Error_Handler_Debug */
+REVEMBER_FUNCTION_EXIT() 
 }
 
 #ifdef  USE_FULL_ASSERT
@@ -228,9 +244,11 @@ void Error_Handler(void)
   */
 void assert_failed(uint8_t *file, uint32_t line)
 {
+REVEMBER_FUNCTION_ENTRY() 
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
      ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
+REVEMBER_FUNCTION_EXIT() 
 }
 #endif /* USE_FULL_ASSERT */
