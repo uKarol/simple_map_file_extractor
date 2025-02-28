@@ -33,7 +33,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32g4xx_hal.h"
-#include "revEMBer.h"
 /** @addtogroup STM32G4xx_HAL_Driver
   * @{
   */
@@ -147,7 +146,6 @@ uint32_t uwTickFreq = HAL_TICK_FREQ_DEFAULT;  /* 1KHz */
   */
 HAL_StatusTypeDef HAL_Init(void)
 {
-	REVEMBER_FUNCTION_ENTRY();
   HAL_StatusTypeDef  status = HAL_OK;
   /* Configure Flash prefetch, Instruction cache, Data cache */
   /* Default configuration at reset is:                      */
@@ -181,7 +179,6 @@ HAL_StatusTypeDef HAL_Init(void)
   }
 
   /* Return function status */
-  REVEMBER_FUNCTION_EXIT();
   return status;
 
 }
@@ -401,7 +398,6 @@ uint32_t HAL_GetTickFreq(void)
   */
 __weak void HAL_Delay(uint32_t Delay)
 {
-  REVEMBER_FUNCTION_ENTRY();
   uint32_t tickstart = HAL_GetTick();
   uint32_t wait = Delay;
 
@@ -414,7 +410,6 @@ __weak void HAL_Delay(uint32_t Delay)
   while ((HAL_GetTick() - tickstart) < wait)
   {
   }
-  REVEMBER_FUNCTION_EXIT();
 }
 
 /**
