@@ -1,4 +1,4 @@
-from DTO_test import *
+from revember_viewer_model.DTO_test import *
 
 class map_extractor:
 

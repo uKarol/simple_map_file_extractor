@@ -1,4 +1,4 @@
-from param_decoder import *
+from revember_viewer_msg_decoder.param_decoder import *
 
 class MapDetailsGetter:
 

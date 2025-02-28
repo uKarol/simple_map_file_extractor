@@ -1,10 +1,10 @@
-from map_file_extractor import map_extractor
-from DTO_test import *
+from revember_viewer_map_extractor.map_file_extractor import map_extractor
+from revember_viewer_model.DTO_test import *
 import serial
-from param_decoder import *
-from GlobalDecoder import *
+from revember_viewer_msg_decoder.param_decoder import *
+from revember_viewer_msg_decoder.GlobalDecoder import *
 import sys
-from thread_interface import *
+from revember_viewer_aux.thread_interface import *
 import traceback 
 import struct
 
