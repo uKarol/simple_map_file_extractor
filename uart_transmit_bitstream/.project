@@ -29,4 +29,11 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>Core/revember_logger</name>
+			<type>2</type>
+			<locationURI>PARENT-1-PROJECT_LOC/revember_logger</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>
