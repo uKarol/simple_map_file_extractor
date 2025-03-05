@@ -133,7 +133,7 @@ void transimt_buffer_flush()
 
 		uint8_t temp_buffer_data[MAX_BUFFER_SIZE];
 		buffer_get(data_buffer, temp_buffer_data, data_size);
-		revEMBer_transmit_bytes(temp_header, data_size);
+		revEMBer_transmit_bytes(temp_buffer_data, data_size);
 	}
 }
 

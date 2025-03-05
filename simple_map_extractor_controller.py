@@ -21,13 +21,13 @@ class MapExtractorController:
         self.connected = False
 
         self.map_getter = MapDetailsGetter(self.model.get_obj_by_addr, self.model.get_nearest_object)
-        self.decoder = WordSequence_protocol_decoder(self.map_getter)
-        self.reader = packet_reader(self.serial_com)
+        self.decoder = GenericDataDecoder(self.map_getter)
+        self.reader = HeaderDecoder(self.serial_com)
 
     def process_received_data(self):
         try:
             (my_packet, data) = self.reader.receive_packet()
-            ret_val = self.decoder.packet_processing(my_packet, data)
+            ret_val = self.decoder.decode(my_packet, data)
             self.view.show_info_object(ret_val)
 
         except TypeError as ex:
@@ -103,6 +103,11 @@ class MapExtractorController:
     def start(self):
         self.task_ctl.start_task()
         self.view.mainloop()
+
+    def on_close(self):
+        self.task_ctl.finish_task()
+        self.view.close_window()
+        
 
     def connect(self):
         try:

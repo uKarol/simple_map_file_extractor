@@ -211,7 +211,11 @@ class TkView2:
 
     def get_connection_params(self):
         return self.connection.get_connection_params()
+    
+    def close_window(self):
+        self.root.destroy()
 
     def mainloop(self):
+        self.root.protocol("WM_DELETE_WINDOW", self.controller.on_close)
         self.root.after(1, self.initial_open)
         self.root.mainloop()
