@@ -3,7 +3,7 @@ import os
 # setting path
 sys.path.append('..')
 
-from revember_viewer_msg_decoder.param_decoder import *
+from revember_viewer_msg_decoder.HeaderDecoder import *
 from revember_viewer_msg_decoder.WSEQ_Decoder import *
 from revember_viewer_msg_decoder.GlobalDecoder import *
 

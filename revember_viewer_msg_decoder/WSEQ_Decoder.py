@@ -1,8 +1,4 @@
-# if __name__ == "__main__":
-#     from WSEQ_Handler import *
-#     from WSEQ_HelperFunctions import *
-# else:
-from revember_viewer_msg_decoder.param_decoder import *
+from revember_viewer_msg_decoder.HeaderDecoder import *
 from revember_viewer_msg_decoder.WSEQ_Handler import *
 from revember_viewer_msg_decoder.WSEQ_HelperFunctions import *
     

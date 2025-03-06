@@ -5,11 +5,20 @@ class pyserial_wrapper:
         pass
 
     def connect(self, port, baud):
-        self.ser = serial.Serial(port, baud)
-        #self.ser.open()
+        try:
+            self.ser = serial.Serial(port, baud)
+        except:
+            raise ConnectionError("CPYSERIAL ERROR \n CANNOT OPEN SERIAL PORT")
     
     def disconnect(self):
-        self.ser.close()
+        try:
+            self.ser.close()
+        except:
+            raise ConnectionError("PYSERIAL ERROR \n CANNOT CLOSE SERIAL PORT")
 
     def read_bytes(self, number):
-        return self.ser.read(number)
+        try:
+            ret_val = self.ser.read(number)
+        except:
+            raise ConnectionError("PYSERIAL ERROR \n CANNOT READ BYTES - CONNECTION LOST")
+        return ret_val

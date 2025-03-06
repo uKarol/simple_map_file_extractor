@@ -26,12 +26,10 @@ class TaskController:
     def finish_task(self):
         self.stop_event.set()
         self.control_event.set()
-        print("finishing")
         #self.periodic_task.join()
 
     def generic_task(self):
         while self.control_event.wait():
             if self.stop_event.is_set():
-                print("finishing")
                 return
             self.task_run()
