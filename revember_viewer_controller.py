@@ -1,14 +1,12 @@
 from revember_viewer_map_extractor.map_file_extractor import map_extractor
 from revember_viewer_model.DTO_test import *
-import serial
-from revember_viewer_msg_decoder.param_decoder import *
+from revember_viewer_msg_decoder.HeaderDecoder import *
 from revember_viewer_msg_decoder.GlobalDecoder import *
-import sys
 from revember_viewer_aux.thread_interface import *
-import traceback 
-import struct
 
-class MapExtractorController:
+import struct
+import time
+class RevemberViewerController:
 
     def __init__(self, model, view, serial_com):
         self.model = model
@@ -21,26 +19,28 @@ class MapExtractorController:
         self.connected = False
 
         self.map_getter = MapDetailsGetter(self.model.get_obj_by_addr, self.model.get_nearest_object)
-        self.decoder = WordSequence_protocol_decoder(self.map_getter)
-        self.reader = packet_reader(self.serial_com)
+        self.decoder = GenericDataDecoder(self.map_getter)
+        self.reader = HeaderDecoder(self.serial_com)
 
     def process_received_data(self):
         try:
             (my_packet, data) = self.reader.receive_packet()
-            ret_val = self.decoder.packet_processing(my_packet, data)
-            self.view.show_info_object(ret_val)
+            if(my_packet != None):
+                ret_val = self.decoder.decode(my_packet, data)
+                self.view.show_info_object(ret_val)
 
         except TypeError as ex:
-            trash, trash2, tb = sys.exc_info()
-            self.view.show_error("TypeError "+ str(ex)+ str(traceback.format_tb(tb)))
-            self.task_ctl.suspend_task()
-        except serial.serialutil.SerialException as ex:
-            self.view.show_error("SerialException \n"+ str(ex))
-            self.task_ctl.suspend_task()
+            self.controller_exception_handler(ex, "process_received_data task")
+
         except struct.error as ex:
-            trash, trash2, tb = sys.exc_info()
-            self.view.show_error("StructError "+ str(ex)+ str(traceback.format_tb(tb)))
-            self.task_ctl.suspend_task()
+            self.controller_exception_handler(ex, "process_received_data task")
+
+        except HeaderReceptionError as ex:
+            self.controller_exception_handler(ex, "process_received_data task")
+            self.view.show_info_object("PROBLEM DURING DATA RECEPTION")
+
+        except ConnectionError as ex:
+            self.controller_exception_handler(ex, "process_received_data task")
 
     def find_object_by_name(self):
         name = self.view.get_object_name()
@@ -89,10 +89,8 @@ class MapExtractorController:
             self.copy_extracetd_data(extractor_dto)
             if(len(map_parse_errors) > 0):
                 self.view.show_error(str(map_parse_errors))
-        except FileNotFoundError as ex:
-            trash, trash2, tb = sys.exc_info()
-            self.view.show_error("FileNotFoundError \n"+ str(ex) + str(traceback.format_tb(tb)))
-
+        except FileNotFoundError as ex:     
+            self.controller_exception_handler(ex, "reloading map file")
 
     def get_all(self):
         keys = self.model.get_all_addrs()
@@ -104,19 +102,40 @@ class MapExtractorController:
         self.task_ctl.start_task()
         self.view.mainloop()
 
+    def on_close(self):
+        self.task_ctl.finish_task()
+        self.view.close_window()
+    
+    #in case of any error: suspend task, disconnect serial, print traceback in console
+    def controller_exception_handler(self, ex : Exception, location : str):
+        try:
+            self._disconnect_and_suspend_task()
+        except:
+            pass #suppress exceptions here - prevent recursion
+        self.view.show_error_in_console(ex, location)
+
     def connect(self):
         try:
             [speed, port_com] = self.view.get_connection_params()
-            
             self.serial_com.connect(port_com, int(speed))
             self.decoder.reset_indentation()
-            self.task_ctl.resume_task()
             
-        except serial.serialutil.SerialException as ex:
+        except ConnectionError as ex:
             self.view.show_error("SerialException \n"+ str(ex))
+            self.controller_exception_handler(ex, "CONNECT BTN CALLBACK")
+        else:
+            self.task_ctl.resume_task()
+            self.view.activate_disconnect_btn()
+
+    def _disconnect_and_suspend_task(self):
+        self.task_ctl.suspend_task()
+        time.sleep(0.1)
+        self.serial_com.disconnect()
+        self.view.activate_connect_btn()
 
     def disconnect(self):
-        self.task_ctl.suspend_task()
-        self.serial_com.disconnect()
-        
+        try:
+            self._disconnect_and_suspend_task()
+        except ConnectionError as ex:
+            self.controller_exception_handler(ex, "DISCONNECT BUTTON CALLBACK")
 

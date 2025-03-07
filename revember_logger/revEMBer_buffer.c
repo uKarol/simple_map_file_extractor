@@ -9,27 +9,40 @@
 #include "revember_buffer.h"
 #include "buffer_config.h"
 
-struct revember_buffer{
-    uint32_t head_ptr;
-    uint32_t tail_ptr;
-    uint32_t element_number;
-    uint8_t *buffer;
-};
+#ifndef TEST
+	#define PRIVATE_OBJ static
+#else
+	#define PRIVATE_OBJ
+#endif
 
-static uint8_t buffer_array[MAX_BUFFER_SIZE][MAX_BUFFER_NUMBER];
-static revember_buffer my_buffer[MAX_BUFFER_NUMBER];
+
+
+PRIVATE_OBJ uint8_t buffer_array[MAX_BUFFER_NUMBER][MAX_BUFFER_SIZE];
+PRIVATE_OBJ revember_buffer my_buffer[MAX_BUFFER_NUMBER];
+PRIVATE_OBJ uint8_t allocated_buffer_count = 0;
 
 /**
  *
  */
 buffer_status_t buffer_init(revember_buffer **buffer)
-{
-    *buffer = &(my_buffer[0]);
-    my_buffer->buffer = buffer_array[0];
-    my_buffer->element_number = 0;
-    my_buffer->head_ptr = 0;
-    my_buffer->tail_ptr = 0;
-    return BUFFER_OK;
+{   
+    buffer_status_t ret_val;
+    if(allocated_buffer_count == MAX_BUFFER_NUMBER)
+    {
+        *buffer = NULL;
+        ret_val = BUFFER_ERROR;
+    }
+    else
+    {
+        *buffer = &(my_buffer[allocated_buffer_count]);
+        (*buffer)->buffer = buffer_array[allocated_buffer_count];
+        (*buffer)->element_number = 0;
+        (*buffer)->head_ptr = 0;
+        (*buffer)->tail_ptr = 0;
+        allocated_buffer_count++;
+        ret_val = BUFFER_OK;
+    }
+    return ret_val;
 }
 
 /**
@@ -49,7 +62,7 @@ buffer_status_t buffer_clear(revember_buffer *buffer)
 buffer_status_t buffer_put(revember_buffer *buffer, uint8_t *data, uint16_t size)
 {
     buffer_status_t ret_val;
-    if(buffer->element_number + size < MAX_BUFFER_SIZE)
+    if(buffer->element_number + size <= MAX_BUFFER_SIZE)
     {
         for(uint32_t i = 0; i < size; i++)
         {
@@ -71,7 +84,7 @@ uint32_t buffer_get_size(revember_buffer *buffer)
     return buffer->element_number;
 }
 
-volatile uint8_t error = 0;
+
 /**
  *
  */

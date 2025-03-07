@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "unity.h": "c",
+        "revember_buffer.h": "c",
+        "buffer_config.h": "c",
+        "type_traits": "c",
+        "mock_buffer_config.h": "c"
+    }
+}

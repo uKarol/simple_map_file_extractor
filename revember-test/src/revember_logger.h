@@ -1,0 +1,6 @@
+
+#ifndef REVEMBER_LOGGER_H
+#define REVEMBER_LOGGER_H
+
+
+#endif // REVEMBER_LOGGER_H

@@ -10,6 +10,7 @@
 
 #include <stdint.h>
 
+#ifndef TEST
 #define REVEMBER_FUNCTION_ENTRY() \
 		{							\
 		uint32_t temp_lr = 0;\
@@ -33,7 +34,7 @@
 			:"memory");\
 		revEMBer_WSEQ(1, 0, FUNCTION_EXIT, temp_pc);\
 		}
-
+#endif
 typedef void (*tx_function)(uint8_t *data, uint16_t size);
 
 typedef enum
@@ -58,6 +59,12 @@ typedef enum
 	SCENARION_DBG_0,
 }revEMBer_scenarios_t;
 
+typedef enum
+{
+	REVEMBER_ERROR,
+	REVEMBER_OK,
+}revEMBer_status_t;
+
 typedef struct
 {
 	uint8_t sync;
@@ -69,7 +76,7 @@ typedef struct
 void transimt_buffer_flush();
 void revEMBer_transmit_interface_active();
 void revEMBer_transmit_interface_inactive();
-void revember_logger_init(tx_function tx_function_f);
+revEMBer_status_t revember_logger_init(tx_function tx_function_f);
 void revEMBer_WSEQ(uint8_t arg_num, uint16_t scenario_id, ...);
 //void revEMBer_send_text(uint16_t scenario, uint8_t *text, uint8_t size);
 

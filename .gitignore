@@ -1,2 +1,6 @@
 *.pyc
+*.o
+*.exe
+*.d
+/revember-test/build
 */Debug

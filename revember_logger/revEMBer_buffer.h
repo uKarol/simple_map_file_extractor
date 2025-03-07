@@ -9,9 +9,14 @@
 #define INC_REVEMBER_BUFFER_H_
 
 #include <stdint.h>
-
-typedef struct revember_buffer revember_buffer;
-
+#include <stddef.h>
+ //struct revember_buffer revember_buffer;
+ typedef struct revember_buffer{
+    uint32_t head_ptr;
+    uint32_t tail_ptr;
+    uint32_t element_number;
+    uint8_t *buffer;
+}revember_buffer;
 typedef enum{
     BUFFER_OK,
     BUFFER_EMPTY,
