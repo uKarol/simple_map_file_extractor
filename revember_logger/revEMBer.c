@@ -77,6 +77,7 @@ PRIVATE_OBJ uint16_t last_scenario_id = 0;
 PRIVATE_OBJ uint16_t last_msg_type = 0;
 PRIVATE_OBJ uint16_t last_size = 0;
 
+
 void revember_finish_buffering();
 
 mcu_mode revember_check_mcu_mode()
@@ -173,29 +174,35 @@ uint8_t transmission_possible()
 
  void revember_buffer_frame(uint16_t scenario_id, uint16_t msg_type, uint16_t size, uint8_t* frame)
  {
-	if((last_scenario_id == scenario_id) && (last_msg_type == msg_type))
+	if(BUFFER_OK == buffer_put(data_buffer, frame, size))
 	{
-		last_size += size;
-	}
-	else
-	{
-		if(last_size > 0)
+		if((last_scenario_id == scenario_id) && (last_msg_type == msg_type))
 		{
-			uint8_t header_frame[HEADER_FRAME_SIZE];
-			revEMBer_prepare_header_frame(last_scenario_id, last_msg_type, last_size, header_frame);
-			buffer_put(header_buffer, header_frame, HEADER_FRAME_SIZE);
+			last_size += size;
 		}
-		last_size = size;
-		last_scenario_id = scenario_id;
-		last_msg_type = msg_type;
+		else
+		{
+			if(last_size > 0)
+			{
+				uint8_t header_frame[HEADER_FRAME_SIZE];
+				revEMBer_prepare_header_frame(last_scenario_id, last_msg_type, last_size, header_frame);
+				buffer_put(header_buffer, header_frame, HEADER_FRAME_SIZE);
+			}
+			last_size = size;
+			last_scenario_id = scenario_id;
+			last_msg_type = msg_type;
+		}
 	}
-	buffer_put(data_buffer, frame, size);
  }
 
  void revember_send_frame(uint16_t scenario_id, uint16_t msg_type, uint16_t size, uint8_t* frame)
  {
 	if(transmission_possible())
 	{
+		if(last_size > 0)
+		{
+			transimt_buffer_flush();
+		}
 		uint8_t header_frame[HEADER_FRAME_SIZE];
 		revEMBer_prepare_header_frame(scenario_id, msg_type, size, header_frame);
 		revEMBer_transmit_bytes(header_frame, HEADER_FRAME_SIZE);

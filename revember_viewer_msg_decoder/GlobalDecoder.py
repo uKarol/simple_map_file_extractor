@@ -37,6 +37,7 @@ class GenericDataDecoder:
         return ret_val
 
     def decode(self, header:HeaderFrame, packet_data):
+        ret_val = ""
         try:
             ret_val = self.handlers[header.id].data_processing(header.datasize, packet_data, self.indent)
         except IndexError as ex:
