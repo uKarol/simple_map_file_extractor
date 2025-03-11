@@ -96,7 +96,7 @@ REVEMBER_FUNCTION_ENTRY()
   /* Configure the system clock */
 
   SystemClock_Config();
-  //revember_activate_logging_on_isr(15);
+  revember_activate_logging_on_isr(15);
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
