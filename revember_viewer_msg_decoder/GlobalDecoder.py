@@ -1,6 +1,7 @@
 from revember_viewer_msg_decoder.HeaderDecoder import *
 from revember_viewer_msg_decoder.WSEQ_Decoder import *
-
+from revember_viewer_msg_decoder.TEXT_msg_decoder import *
+from revember_viewer_msg_decoder.ERROR_decoder import *
 
 class MapDetailsGetter:
 
@@ -26,7 +27,10 @@ class MapDetailsGetter:
 class GenericDataDecoder:
 
     def __init__(self, map_getter):
-        self.handlers = {1: WordSequenceProtocolDecoder(map_getter)}
+        self.handlers = {   0: TEXT_Decoder(),
+                            1: WordSequenceProtocolDecoder(map_getter),
+                            2: ERROR_Decoder(),
+                         }
         self.indent = [0]
 
     def reset_indentation(self):
@@ -42,7 +46,5 @@ class GenericDataDecoder:
             ret_val = self.handlers[header.id].data_processing(header.datasize, packet_data, self.indent)
         except IndexError as ex:
             ret_val = self.default_handler(header, packet_data)
-        except KeyError as ex:
-            rev_val = "INVALID PROTOCOL ID"
         return ret_val
 

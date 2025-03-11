@@ -84,6 +84,8 @@ REVEMBER_FUNCTION_ENTRY()
 
   /* MCU Configuration--------------------------------------------------------*/
 	revember_logger_init(tx_f);
+
+  revember_activate_logging_on_thread(0);
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
 
@@ -92,8 +94,9 @@ REVEMBER_FUNCTION_ENTRY()
   /* USER CODE END Init */
 
   /* Configure the system clock */
-  SystemClock_Config();
 
+  SystemClock_Config();
+  //revember_activate_logging_on_isr(15);
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
@@ -120,7 +123,7 @@ REVEMBER_FUNCTION_ENTRY()
   {
     Error_Handler();
   }
-  revEMBer_transmit_interface_active();
+  //revEMBer_transmit_interface_active();
   transimt_buffer_flush();
   uint8_t size = 0;
   /* Infinite loop */
@@ -132,7 +135,7 @@ REVEMBER_FUNCTION_ENTRY()
     /* USER CODE END WHILE */
 	  size++;
 
-
+	  transimt_buffer_flush();
 	  HAL_Delay(1000);
     /* USER CODE BEGIN 3 */
   }
@@ -155,7 +158,6 @@ REVEMBER_FUNCTION_ENTRY()
   /** Configure the main internal regulator output voltage
   */
   HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1_BOOST);
-
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
