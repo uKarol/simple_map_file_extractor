@@ -3,4 +3,6 @@
 *.exe
 *.d
 /revember-test/build
-*/Debug
+Debug
+.settings
+*.launch
