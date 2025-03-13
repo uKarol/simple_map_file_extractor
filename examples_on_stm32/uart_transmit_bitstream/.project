@@ -33,7 +33,7 @@
 		<link>
 			<name>Core/revember_logger</name>
 			<type>2</type>
-			<locationURI>PARENT-1-PROJECT_LOC/revember_logger</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/revember_logger</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

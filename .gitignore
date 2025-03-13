@@ -6,3 +6,4 @@
 Debug
 .settings
 *.launch
+.metadata

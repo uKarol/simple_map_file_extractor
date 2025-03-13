@@ -48,10 +48,12 @@ class GenericDataDecoder:
                             1: WordSequenceProtocolDecoder(map_getter),
                             2: ERROR_Decoder(),
                          }
-        self.scn_mgr = RevemberScenarioManager(256)
+        self.scn_number = 256
+        self.scn_mgr = RevemberScenarioManager(self.scn_number)
 
     def reset_indentation(self):
-        pass
+        for i in range(1,self.scn_number):
+            self.scn_mgr.reset_indent(i)
 
     def default_handler(self, header:HeaderFrame, packet_data):
         ret_val = f'cannot decode \nparam id: {header.id} \nraw data {packet_data} \n'
@@ -64,7 +66,6 @@ class GenericDataDecoder:
             if(self.scn_mgr.last_used_scenario != header.scenario):
                 addition = f"SCENARIO CHANGED {header.scenario}\n"
             self.scn_mgr.last_used_scenario = header.scenario 
-            print(f"scn 0 {self.scn_mgr.scn[0].indent} scn 15 {self.scn_mgr.scn[15].indent} ")   
             ret_val = addition + self.handlers[header.id].data_processing(header.datasize, packet_data, self.scn_mgr.scn[header.scenario])
         except IndexError as ex:
             ret_val = self.default_handler(header, packet_data)
