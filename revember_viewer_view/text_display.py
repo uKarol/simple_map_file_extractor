@@ -39,6 +39,7 @@ class TextDisplay:
         if self.ovr_var.get() == 1:
             self.erase_display()
         self.result_text.insert(tk.END, text)
+        self.result_text.yview(tk.END)
 
     def erase_display(self):
         self.result_text.delete("1.0", tk.END)
