@@ -3,22 +3,40 @@ from tkinter import messagebox
 from revember_viewer_view.text_display import TextDisplay
 from revember_viewer_view.connection_panel import ConncetionPanel
 from revember_viewer_view.control_panel import ControlPanel
+from revember_viewer_view.status_panel import StatusLog
 import traceback
 import sys
 
 class RevemberViewer_TkView:
 
+    def setup_subframes(self):
+        self.control_frame = tk.Frame(self.root)
+        self.control_frame.grid(row = 0, column=0)
+
+        self.result_frame = tk.Frame(self.root)
+        self.result_frame.grid(row = 0, column=1, rowspan=2, sticky='news')
+
+        self.info_frame = tk.Frame(self.root)
+        self.info_frame.grid(row = 0, column=2, rowspan=2, sticky='news')
+
+        self.con_frame = tk.Frame(self.root)
+        self.con_frame.grid(row=1, column=0)
+
+        self.stat_frame = tk.Frame(self.root)
+        self.stat_frame.grid(row=2, column=0, columnspan=3, sticky='news')
+
     def setup(self, controller):
         
         self.controller = controller
         self.root = tk.Tk()
-
-        self.root.geometry("1050x600")
-        self.root.title("map_extractor")
-        self.control_panel = ControlPanel(self.root, 0, controller)
-        self.result_disp = TextDisplay("result", self.root, 1, 40)
-        self.info_disp = TextDisplay("info", self.root, 2, 60)
-        self.connection_panel = ConncetionPanel(self.root, controller)
+        self.setup_subframes()
+        self.root.geometry("1100x800")
+        self.root.title("revEMBer viewer")
+        self.control_panel = ControlPanel(self.control_frame, controller)
+        self.result_disp = TextDisplay("result", self.result_frame, 40)
+        self.info_disp = TextDisplay("info", self.info_frame, 60)
+        self.connection_panel = ConncetionPanel(self.con_frame, controller)
+        self.status_panel = StatusLog("Status", self.stat_frame)
         self.root.rowconfigure((1,2),weight=1)
         self.activate_connect_btn()
 
@@ -74,8 +92,10 @@ class RevemberViewer_TkView:
 
     def show_error_in_console(self, error, location):
         trash, trash2, tb = sys.exc_info()
-        print(f"PROBLEM OCCURED IN {location}")
-        traceback.print_tb(tb)
+        tb_info = traceback.format_tb(tb)
+        for info in tb_info:
+            self.status_panel.show_text(info)
+        self.status_panel.show_text("THIS EXCEPTION WAS CAUGHT BY APPLICATION, \nYOU DON'T HAVE TO RESET IT")
 
     def mainloop(self):
         self.root.protocol("WM_DELETE_WINDOW", self.controller.on_close)
@@ -92,3 +112,6 @@ class RevemberViewer_TkView:
 
     def auto_indent_is_active(self):
         return self.control_panel.auto_indent_is_active()
+    
+    def update_ports(self, port_list):
+        self.connection_panel.update_ports(port_list)

@@ -47,7 +47,7 @@ class RevemberScenarioManager:
             self.scn[self.last_used_scenario].indent = self.scn[self.last_used_scenario].indent + 1
 
     def decrease_indent(self):
-        if self.indentation_active:
+        if self.indentation_active and self.scn[self.last_used_scenario].indent > 0:
             self.scn[self.last_used_scenario].indent = self.scn[self.last_used_scenario].indent - 1
 
     def get_current_indent(self):
@@ -81,9 +81,9 @@ class GenericDataDecoder:
 
     def disable_default_indent(self):
         self.scn_mgr.disable_default_indent()
+        self.reset_indentation()
 
     def reset_indentation(self):
-        print("reset indentation")
         for i in range(1,self.scn_number):
             self.scn_mgr.reset_indent(i)
 

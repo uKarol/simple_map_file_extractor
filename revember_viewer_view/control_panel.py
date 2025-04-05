@@ -4,13 +4,12 @@ from tkinter.filedialog import askopenfilename
 
 class ControlPanel:
 
-    def __init__(self, master, position, controller):
+    def __init__(self, master, controller):
         self.controller = controller
-        self.control_frame = tk.Frame(master)
+        self.control_frame = master
         self.setup_file_finder()
         self.setup_address_entry()
         self.indetation_ctl_setup()
-        self.control_frame.grid(row = position, column=0)
         
     def auto_indent_is_active(self):
         return self.auto_indent_var.get()
@@ -36,6 +35,7 @@ class ControlPanel:
         self.indent_clear_btn = tk.Button(master = self.idnt_frame, text="reset_indantation", command = self.controller.reset_indantation)
         self.idnt_frame.pack(side=tk.BOTTOM)
         self.auto_indent_var = tk.BooleanVar()
+        self.auto_indent_var.set(True)
         self.ctl_checkbox = tk.Checkbutton(master=self.idnt_frame, variable=self.auto_indent_var, text="auto indentation", command=self.set_indentation)
         self.ctl_checkbox.pack()
         self.indent_clear_btn.pack()
@@ -94,4 +94,3 @@ class ControlPanel:
             filetypes=[("Map Files", "*.map"), ("All Files", "*.*")]
         )
         self.set_file_path(filepath)
-        print(filepath)

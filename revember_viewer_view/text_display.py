@@ -17,14 +17,14 @@ class TextDisplay:
         self.dip_ctl_frame.pack(side = tk.RIGHT)
 
 
-    def __init__(self, title, master, position, width):
-        self.result_frame = tk.Frame(master)
+    def __init__(self, title, master, width):
+        self.result_frame = master
         self.result_label = tk.Label(master=self.result_frame, text=title)
         self.result_text = scrolledtext.ScrolledText(master=self.result_frame, width=width)
         self.result_label.pack()
         self.result_text.pack(expand=1, fill=tk.BOTH)
         self.disp_controls_setup()
-        self.result_frame.grid(row = 0, column=position, rowspan=2, sticky='news')
+
 
     def save_to_file(self):
         files = [('All Files', '*.*'),   
