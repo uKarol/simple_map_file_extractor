@@ -11,7 +11,7 @@ class TaskController:
         self.control_event.clear()
         self.stop_event = threading.Event()
         self.stop_event.clear()
-        self.periodic_task = threading.Thread(target=self.generic_task, daemon=False)
+        self.periodic_task = threading.Thread(target=self.generic_task, daemon=True)
         self.terminate_task = False
 
     def start_task(self):
