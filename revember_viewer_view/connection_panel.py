@@ -1,14 +1,15 @@
 import tkinter as tk
+from tkinter.ttk import Combobox
 
 class ConncetionPanel:
     
     def __init__(self, master, controller):
 
         self.controller = controller
-        self.port_var = tk.StringVar(value="COM3")
-        self.con_frame = tk.Frame(master)
-        self.port_entry = tk.Entry(self.con_frame, textvariable=self.port_var)
-        self.port_entry.grid(row=0, column=0)
+        self.port_var = tk.StringVar(value="Select COM port")
+        self.con_frame = master
+        self.m_select=Combobox(self.con_frame,textvariable=self.port_var ,postcommand = self.controller.updateComPortList)
+        self.m_select.grid(row=0, column=0)
         self.port_lbl = tk.Label(self.con_frame, text="PORT COM")
         self.port_lbl.grid(row=0, column=1)
 
@@ -23,10 +24,14 @@ class ConncetionPanel:
         self.disconnect_button = tk.Button(self.con_frame, text="DISCONNECT", command= self.controller.disconnect)
         self.disconnect_button.grid(row=2, column=1)
 
-        self.con_frame.grid(row=1, column=0)
+        
+
+    def update_ports(self, port_list):
+        self.m_select['values']=port_list
 
     def get_connection_params(self):
-        return [self.speed_entry.get(), self.port_entry.get()]
+        port = self.port_var.get().split()
+        return [self.speed_entry.get(), port[0]]
     
     def activate_connect_button(self):
         self.connect_button.config(state=tk.NORMAL)

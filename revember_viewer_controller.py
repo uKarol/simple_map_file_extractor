@@ -4,6 +4,9 @@ from revember_viewer_msg_decoder.HeaderDecoder import *
 from revember_viewer_msg_decoder.GlobalDecoder import *
 from revember_viewer_aux.thread_interface import *
 
+import serial
+import serial.tools.list_ports
+
 import struct
 import time
 class RevemberViewerController:
@@ -37,7 +40,7 @@ class RevemberViewerController:
 
         except HeaderReceptionError as ex:
             self.controller_exception_handler(ex, "process_received_data task")
-            self.view.show_info_object("PROBLEM DURING DATA RECEPTION")
+            #self.view.show_info_object("PROBLEM DURING DATA RECEPTION")
 
         except ConnectionError as ex:
             self.controller_exception_handler(ex, "process_received_data task")
@@ -114,6 +117,12 @@ class RevemberViewerController:
             pass #suppress exceptions here - prevent recursion
         self.view.show_error_in_console(ex, location)
 
+    def disable_auto_indentation(self):
+        self.decoder.disable_default_indent()
+    
+    def enable_auto_indentation(self):
+        self.decoder.enable_default_indent()
+
     def connect(self):
         try:
             [speed, port_com] = self.view.get_connection_params()
@@ -133,9 +142,15 @@ class RevemberViewerController:
         self.serial_com.disconnect()
         self.view.activate_connect_btn()
 
+    def reset_indantation(self):
+        self.decoder.reset_indentation()
+
     def disconnect(self):
         try:
             self._disconnect_and_suspend_task()
         except ConnectionError as ex:
             self.controller_exception_handler(ex, "DISCONNECT BUTTON CALLBACK")
 
+    def updateComPortList(self):
+        ports=list(serial.tools.list_ports.comports())
+        self.view.update_ports(ports)

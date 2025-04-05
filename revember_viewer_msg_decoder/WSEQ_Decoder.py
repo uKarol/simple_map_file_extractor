@@ -42,27 +42,27 @@ class WordSequenceProtocolDecoder:
         ret_val = f'cannot decode \nparam id: {param_id} \nraw data {hex(packet_data)} \n'
         return ret_val
 
-    def _run_handler(self, param_id: int, packet_data, indent):
+    def _run_handler(self, param_id: int, packet_data, display_options):
         try:
             method_name = self.predefined_methods[param_id]
             ret_val : str
             handler = getattr(WordSequenceHandler, method_name)
-            ret_val = handler(self.protocol_handler, packet_data, indent)
+            ret_val = handler(self.protocol_handler, packet_data, display_options)
         except IndexError as ex:
             ret_val = self._default_WSEQ_handler(param_id, packet_data)
         return ret_val
 
-    def data_processing(self, datasize: int, data : bytes, indent):
+    def data_processing(self, datasize: int, data : bytes, display_options):
         number_of_params = datasize//5
         WordSequence_frame = WordSequence_Frame()
         WordSequence_frame.set_length(number_of_params)
         WordSequence_frame.unpack(data)
         if(number_of_params == 1):
-            return self._run_handler(WordSequence_frame.x.id, WordSequence_frame.x.value, indent)
+            return self._run_handler(WordSequence_frame.x.id, WordSequence_frame.x.value, display_options)
         else:
             ret_val = ""
             for i in range(0, number_of_params):
-                ret_val += self._run_handler(WordSequence_frame.x[i].id, WordSequence_frame.x[i].value, indent)
+                ret_val += self._run_handler(WordSequence_frame.x[i].id, WordSequence_frame.x[i].value, display_options)
             return ret_val
         
 
