@@ -114,6 +114,12 @@ class RevemberViewerController:
             pass #suppress exceptions here - prevent recursion
         self.view.show_error_in_console(ex, location)
 
+    def disable_auto_indentation(self):
+        self.decoder.disable_default_indent()
+    
+    def enable_auto_indentation(self):
+        self.decoder.enable_default_indent()
+
     def connect(self):
         try:
             [speed, port_com] = self.view.get_connection_params()
@@ -132,6 +138,9 @@ class RevemberViewerController:
         time.sleep(0.1)
         self.serial_com.disconnect()
         self.view.activate_connect_btn()
+
+    def reset_indantation(self):
+        self.decoder.reset_indentation()
 
     def disconnect(self):
         try:

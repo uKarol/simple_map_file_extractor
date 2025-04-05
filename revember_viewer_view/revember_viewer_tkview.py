@@ -89,3 +89,6 @@ class RevemberViewer_TkView:
     def activate_disconnect_btn(self):
         self.connection_panel.activate_disconnect_button()
         self.connection_panel.disable_connect_button()
+
+    def auto_indent_is_active(self):
+        return self.control_panel.auto_indent_is_active()

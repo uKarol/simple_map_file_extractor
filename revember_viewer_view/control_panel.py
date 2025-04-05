@@ -3,14 +3,17 @@ from tkinter.filedialog import askopenfilename
 
 
 class ControlPanel:
-    
+
     def __init__(self, master, position, controller):
         self.controller = controller
         self.control_frame = tk.Frame(master)
         self.setup_file_finder()
         self.setup_address_entry()
+        self.indetation_ctl_setup()
         self.control_frame.grid(row = position, column=0)
         
+    def auto_indent_is_active(self):
+        return self.auto_indent_var.get()
 
     def setup_file_finder(self):
         self.file_finder_frame = tk.Frame(self.control_frame)
@@ -27,6 +30,15 @@ class ControlPanel:
         self.reload_btn.pack(side=tk.RIGHT)
         self.file_finder_frame.pack(side=tk.TOP)
         self.file_string_var.set("first_project.map")
+
+    def indetation_ctl_setup(self):
+        self.idnt_frame = tk.Frame(master = self.control_frame)
+        self.indent_clear_btn = tk.Button(master = self.idnt_frame, text="reset_indantation", command = self.controller.reset_indantation)
+        self.idnt_frame.pack(side=tk.BOTTOM)
+        self.auto_indent_var = tk.BooleanVar()
+        self.ctl_checkbox = tk.Checkbutton(master=self.idnt_frame, variable=self.auto_indent_var, text="auto indentation", command=self.set_indentation)
+        self.ctl_checkbox.pack()
+        self.indent_clear_btn.pack()
 
     def setup_address_entry(self):
         self.address_frame = tk.Frame(master = self.control_frame)
@@ -55,6 +67,12 @@ class ControlPanel:
         self.reg_entry.pack(side=tk.LEFT)
         self.reg_btn.pack(side=tk.RIGHT)
         self.reg_frame.pack()
+
+    def set_indentation(self):
+        if self.auto_indent_var.get():
+            self.controller.enable_auto_indentation()
+        else:
+            self.controller.disable_auto_indentation()
 
     def get_reg_address(self):
         return self.reg_entry.get()

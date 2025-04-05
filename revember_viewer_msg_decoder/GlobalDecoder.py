@@ -31,15 +31,40 @@ class RevemberScenarioManager:
 
     def __init__(self, scenarios_nuber):
         self.scn = []
+        self.indentation_active = True
         for i in range (0, scenarios_nuber):
             self.scn.append(RevemberScenario(0)) 
         self.last_used_scenario = 0
+
+    def enable_default_indent(self):
+        self.indentation_active = True
+
+    def disable_default_indent(self):
+        self.indentation_active = False
+
+    def increase_indent(self):
+        if self.indentation_active:
+            self.scn[self.last_used_scenario].indent = self.scn[self.last_used_scenario].indent + 1
+
+    def decrease_indent(self):
+        if self.indentation_active:
+            self.scn[self.last_used_scenario].indent = self.scn[self.last_used_scenario].indent - 1
+
+    def get_current_indent(self):
+        return self.scn[self.last_used_scenario].indent 
 
     def get_scn(self, num):
         return self.scn[num]
 
     def reset_indent(self, num):
         self.scn[num].indent = 0
+
+    def set_scenario(self, scenario):
+        addition = ""
+        if(self.last_used_scenario != scenario):
+            addition = f"SCENARIO CHANGED {scenario}\n"
+        self.last_used_scenario = scenario
+        return addition
 
 class GenericDataDecoder:
 
@@ -51,7 +76,14 @@ class GenericDataDecoder:
         self.scn_number = 256
         self.scn_mgr = RevemberScenarioManager(self.scn_number)
 
+    def enable_default_indent(self):
+        self.scn_mgr.enable_default_indent()
+
+    def disable_default_indent(self):
+        self.scn_mgr.disable_default_indent()
+
     def reset_indentation(self):
+        print("reset indentation")
         for i in range(1,self.scn_number):
             self.scn_mgr.reset_indent(i)
 
@@ -62,12 +94,11 @@ class GenericDataDecoder:
     def decode(self, header:HeaderFrame, packet_data):
         ret_val = ""
         try:
-            addition = ""
-            if(self.scn_mgr.last_used_scenario != header.scenario):
-                addition = f"SCENARIO CHANGED {header.scenario}\n"
-            self.scn_mgr.last_used_scenario = header.scenario 
-            ret_val = addition + self.handlers[header.id].data_processing(header.datasize, packet_data, self.scn_mgr.scn[header.scenario])
+            addition = self.scn_mgr.set_scenario(header.scenario)
+            ret_val = addition + self.handlers[header.id].data_processing(header.datasize, packet_data, self.scn_mgr)
         except IndexError as ex:
+            ret_val = self.default_handler(header, packet_data)
+        except KeyError as ex:
             ret_val = self.default_handler(header, packet_data)
         return ret_val
 
