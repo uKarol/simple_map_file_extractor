@@ -82,7 +82,7 @@ buffer_status_t buffer_put(revember_buffer *buffer, uint8_t *data, uint16_t size
 uint32_t buffer_get_size(revember_buffer *buffer)
 {
     return buffer->element_number;
-}
+ }
 
 
 /**

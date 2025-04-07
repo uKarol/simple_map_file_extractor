@@ -20,9 +20,19 @@ class TextDisplay:
     def __init__(self, title, master, width):
         self.result_frame = master
         self.result_label = tk.Label(master=self.result_frame, text=title)
-        self.result_text = scrolledtext.ScrolledText(master=self.result_frame, width=width)
+        textContainer = tk.Frame(self.result_frame, borderwidth=1, relief="sunken")
+        self.result_text = tk.Text(textContainer, width=width, wrap = "none")
+        textVsb = tk.Scrollbar(textContainer, orient="vertical", command=self.result_text.yview)
+        textHsb = tk.Scrollbar(textContainer, orient="horizontal", command=self.result_text.xview)
+        self.result_text.configure(yscrollcommand=textVsb.set, xscrollcommand=textHsb.set)
         self.result_label.pack()
-        self.result_text.pack(expand=1, fill=tk.BOTH)
+        textContainer.pack(expand=1, fill=tk.BOTH)
+        self.result_text.grid(row=0, column=0, sticky="nsew")
+        textVsb.grid(row=0, column=1, sticky="ns")
+        textHsb.grid(row=1, column=0, sticky="ew")
+
+        textContainer.grid_rowconfigure(0, weight=1)
+        textContainer.grid_columnconfigure(0, weight=1)
         self.disp_controls_setup()
 
 

@@ -41,7 +41,8 @@ typedef enum
 	REVEMBER_LOGGER_NOT_INITIALIZED,
 	REVEMBER_LOGGER_ACTIVE,
 	REVEMBER_LOGGER_SUSPENDED,
-	REVEMBER_LOGGER_ERROR,
+	REVEMBER_LOGGER_ERROR_ACTIVE,
+	REVEMBER_LOGGER_ERROR_SUSPENDED,
 }revember_logger_status_t;
 
 typedef enum
@@ -54,7 +55,7 @@ PRIVATE_OBJ volatile revember_logger_status_t revember_logger_status = REVEMBER_
 PRIVATE_OBJ revember_buffer *data_buffer = NULL;
 PRIVATE_OBJ revember_buffer *header_buffer = NULL;
 PRIVATE_OBJ tx_function logging_tx_fun = NULL;
-PRIVATE_OBJ void revEMBer_prepare_header_frame(uint16_t scenario, uint16_t msg_type, uint16_t size, uint8_t* header_frame);
+PRIVATE_OBJ void revember_prepare_header_frame(uint16_t scenario, uint16_t msg_type, uint16_t size, uint8_t* header_frame);
 PRIVATE_OBJ void revember_set_error(uint16_t scenario_id, uint8_t error_code);
 
 
@@ -95,7 +96,7 @@ PRIVATE_OBJ revember_logger_status_t get_scenario_id(uint16_t *scenario_num)
 	return ret_val;
 }
 
-PRIVATE_OBJ void revEMBer_transmit_bytes(uint8_t *bytes_to_send, uint16_t size)
+PRIVATE_OBJ void revember_transmit_bytes(uint8_t *bytes_to_send, uint16_t size)
 {
 	revember_logger_status_t last_state = revember_logger_status;
 	revember_logger_status = REVEMBER_LOGGER_SUSPENDED;
@@ -110,7 +111,7 @@ PRIVATE_OBJ void revember_finish_buffering()
 	if(last_size > 0)
 	{
 		uint8_t header_frame[HEADER_FRAME_SIZE];
-		revEMBer_prepare_header_frame(last_scenario_id, last_msg_type, last_size, header_frame);
+		revember_prepare_header_frame(last_scenario_id, last_msg_type, last_size, header_frame);
 		buffer_put(header_buffer, header_frame, HEADER_FRAME_SIZE);
 	}
 	last_size = 0;
@@ -119,7 +120,7 @@ PRIVATE_OBJ void revember_finish_buffering()
 	__enable_irq();
 }
 
-PRIVATE_OBJ void revEMBer_prepare_header_frame(uint16_t scenario, uint16_t msg_type, uint16_t size, uint8_t* header_frame)
+PRIVATE_OBJ void revember_prepare_header_frame(uint16_t scenario, uint16_t msg_type, uint16_t size, uint8_t* header_frame)
 {
 	uint8_t sync_byte = SYNC_BYTE;
 	memcpy(header_frame, &(sync_byte), SYNC_SIZE);
@@ -142,7 +143,7 @@ void revember_buffer_frame(uint16_t scenario_id, uint16_t msg_type, uint16_t siz
 			if(last_size > 0)
 			{
 				uint8_t header_frame[HEADER_FRAME_SIZE];
-				revEMBer_prepare_header_frame(last_scenario_id, last_msg_type, last_size, header_frame);
+				revember_prepare_header_frame(last_scenario_id, last_msg_type, last_size, header_frame);
 				buffer_put(header_buffer, header_frame, HEADER_FRAME_SIZE);
 			}
 			last_size = size;
@@ -161,7 +162,7 @@ void revember_buffer_frame(uint16_t scenario_id, uint16_t msg_type, uint16_t siz
 }
 
 
-void revEMBer_WSEQ_auto(uint8_t arg_num, ...)
+void revember_WSEQ_auto(uint8_t arg_num, ...)
 {
 	uint16_t scenario_id;
 	if((get_scenario_id(&scenario_id) == REVEMBER_LOGGER_ACTIVE) &&
@@ -182,7 +183,7 @@ void revEMBer_WSEQ_auto(uint8_t arg_num, ...)
 	}
 }
 
-void revEMBer_WSEQ(uint8_t arg_num, uint16_t scenario_id, ...)
+void revember_WSEQ(uint8_t arg_num, uint16_t scenario_id, ...)
 {
 	if(revember_logger_status == REVEMBER_LOGGER_ACTIVE)
 	{
@@ -203,7 +204,7 @@ void revEMBer_WSEQ(uint8_t arg_num, uint16_t scenario_id, ...)
 	}
 }
 
-void revEMBer_send_text(uint16_t scenario, uint8_t *text, uint8_t size)
+void revember_send_text(uint16_t scenario, uint8_t *text, uint8_t size)
 {
 	if(revember_logger_status == REVEMBER_LOGGER_ACTIVE)
 	{
@@ -213,7 +214,7 @@ void revEMBer_send_text(uint16_t scenario, uint8_t *text, uint8_t size)
 	}
 }
 
-void revEMBer_send_text_auto(uint8_t *text, uint8_t size)
+void revember_send_text_auto(uint8_t *text, uint8_t size)
 {
 	uint16_t scenario_id;
 	if((get_scenario_id(&scenario_id) == REVEMBER_LOGGER_ACTIVE) &&
@@ -225,10 +226,10 @@ void revEMBer_send_text_auto(uint8_t *text, uint8_t size)
 	}
 }
 
-void transimt_buffer_flush()
+void revember_buffer_flush()
 {
 	if((revember_logger_status == REVEMBER_LOGGER_ACTIVE) || 
-		(revember_logger_status == REVEMBER_LOGGER_ERROR))
+		(revember_logger_status == REVEMBER_LOGGER_ERROR_ACTIVE))
 	{
 		revember_finish_buffering();
 		uint16_t number_of_frames = buffer_get_size(header_buffer) / HEADER_FRAME_SIZE; 
@@ -236,19 +237,20 @@ void transimt_buffer_flush()
 		{
 			uint8_t temp_header[HEADER_FRAME_SIZE];
 			buffer_get(header_buffer, temp_header, HEADER_FRAME_SIZE);
-			revEMBer_transmit_bytes(temp_header, HEADER_FRAME_SIZE);
+			revember_transmit_bytes(temp_header, HEADER_FRAME_SIZE);
 			uint16_t data_size;
 			memcpy((uint8_t*)(&data_size), temp_header + 5, 2);
 			
 
 			uint8_t temp_buffer_data[MAX_BUFFER_SIZE];
 			buffer_get(data_buffer, temp_buffer_data, data_size);
-			revEMBer_transmit_bytes(temp_buffer_data, data_size);
+			revember_transmit_bytes(temp_buffer_data, data_size);
 		}
 	}
-	if(revember_logger_status == REVEMBER_LOGGER_ERROR)
+	if(revember_logger_status == REVEMBER_LOGGER_ERROR_ACTIVE)
 	{
-		revEMBer_transmit_bytes(error_buffer, HEADER_FRAME_SIZE+1);
+		revember_transmit_bytes(error_buffer, HEADER_FRAME_SIZE+1);
+		revember_logger_status = REVEMBER_LOGGER_ERROR_SUSPENDED;
 	}
 }
 
@@ -280,8 +282,8 @@ revEMBer_status_t revember_logger_init(tx_function tx_function_f)
 
 void revember_set_error(uint16_t scenario_id, uint8_t error_code)
 {
-	revember_logger_status = REVEMBER_LOGGER_ERROR;
-	revEMBer_prepare_header_frame(scenario_id, ERROR_MESSAGE, 1, error_buffer);
+	revember_logger_status = REVEMBER_LOGGER_ERROR_ACTIVE;
+	revember_prepare_header_frame(scenario_id, ERROR_MESSAGE, 1, error_buffer);
 	error_buffer[HEADER_FRAME_SIZE] = error_code;
 	//revember_buffer_frame(scenario_id, ERROR_MESSAGE, 1, &error_code, __get_PRIMASK());
 }
