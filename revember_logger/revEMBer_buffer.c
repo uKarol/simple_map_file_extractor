@@ -15,7 +15,7 @@
 	#define PRIVATE_OBJ
 #endif
 
-
+#define MAX_BUFFER_NUMBER 2
 
 PRIVATE_OBJ uint8_t buffer_array[MAX_BUFFER_NUMBER][MAX_BUFFER_SIZE];
 PRIVATE_OBJ revember_buffer my_buffer[MAX_BUFFER_NUMBER];
