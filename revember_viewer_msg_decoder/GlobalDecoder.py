@@ -69,7 +69,8 @@ class RevemberScenarioManager:
 class GenericDataDecoder:
 
     def __init__(self, map_getter):
-        self.handlers = {   0: TEXT_Decoder(),
+        texter = Text_Callback_Processing()
+        self.handlers = {   0: TEXT_Decoder(texter.text_processing),
                             1: WordSequenceProtocolDecoder(map_getter),
                             2: ERROR_Decoder(),
                          }
@@ -84,7 +85,7 @@ class GenericDataDecoder:
         self.reset_indentation()
 
     def reset_indentation(self):
-        for i in range(1,self.scn_number):
+        for i in range(0,self.scn_number):
             self.scn_mgr.reset_indent(i)
 
     def default_handler(self, header:HeaderFrame, packet_data):

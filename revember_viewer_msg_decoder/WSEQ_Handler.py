@@ -27,3 +27,7 @@ class WordSequenceHandler:
     def VARIABLE_POINTER_handler(self, packet_data, display_options):
         ret_val = f'variable by pointer: {self.helper_functions.decode_addr(packet_data) }\n'
         return ret_val
+
+    def RAW_VALUE_handler(self, packet_data, display_options):
+        ret_val = f'raw value: {packet_data}\n'
+        return ret_val

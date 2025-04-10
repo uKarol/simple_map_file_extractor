@@ -30,6 +30,7 @@ typedef enum
 	LINK_REGISTER,
 	FUNCTION_POINTER,
 	VARIABLE_POINTER,
+	RAW_VALUE,
 }WSEQ_params;
 
 typedef enum
