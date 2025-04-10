@@ -1,5 +1,8 @@
 class ERROR_Decoder:
 
+    def __init__(self, user_handlers):
+        self.user_handlers = user_handlers
+
     error_description = {
         0: "DATA BUFFER OVERFLOW",
     }

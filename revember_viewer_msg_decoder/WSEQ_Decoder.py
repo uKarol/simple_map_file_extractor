@@ -30,8 +30,9 @@ class WordSequence_Frame(cstruct.MemCStruct):
 
 class WordSequenceProtocolDecoder:
 
-    def __init__(self, map_getter):
-        self.protocol_handler = WordSequenceHandler(map_getter)
+    def __init__(self, map_getter, user_handlers):
+        self.user_handlers = user_handlers
+        self.protocol_handler = WordSequenceHandler(map_getter, user_handlers)
         self.predefined_methods = self._get_predefined_methods(WordSequenceHandler)
 
     def _get_predefined_methods(self, handler_class):

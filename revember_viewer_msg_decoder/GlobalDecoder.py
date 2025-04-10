@@ -68,11 +68,11 @@ class RevemberScenarioManager:
 
 class GenericDataDecoder:
 
-    def __init__(self, map_getter):
-        texter = Text_Callback_Processing()
-        self.handlers = {   0: TEXT_Decoder(texter.text_processing),
-                            1: WordSequenceProtocolDecoder(map_getter),
-                            2: ERROR_Decoder(),
+    def __init__(self, map_getter, user_handlers):
+
+        self.handlers = {   0: TEXT_Decoder(user_handlers),
+                            1: WordSequenceProtocolDecoder(map_getter, user_handlers),
+                            2: ERROR_Decoder(user_handlers),
                          }
         self.scn_number = 256
         self.scn_mgr = RevemberScenarioManager(self.scn_number)

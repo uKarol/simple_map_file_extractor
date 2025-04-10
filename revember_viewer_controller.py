@@ -11,7 +11,7 @@ import struct
 import time
 class RevemberViewerController:
 
-    def __init__(self, model, view, serial_com):
+    def __init__(self, model, view, serial_com, user_handlers):
         self.model = model
         self.thread_active = True
         self.view = view
@@ -22,7 +22,7 @@ class RevemberViewerController:
         self.connected = False
 
         self.map_getter = MapDetailsGetter(self.model.get_obj_by_addr, self.model.get_nearest_object)
-        self.decoder = GenericDataDecoder(self.map_getter)
+        self.decoder = GenericDataDecoder(self.map_getter, user_handlers)
         self.reader = HeaderDecoder(self.serial_com)
 
     def process_received_data(self):

@@ -1,7 +1,8 @@
 class WordSequenceHandler:
 
-    def __init__(self, helper_functions): 
+    def __init__(self, helper_functions, user_handlers): 
         self.helper_functions = helper_functions
+        self.user_handler = user_handlers
 
     def FUNCTION_ENTRY_handler(self, packet_data, display_options):
         ret_val = "|"+"-"*display_options.get_current_indent() + f'{self.helper_functions.decode_LR_or_PC(packet_data)} entry \n'
