@@ -3,6 +3,7 @@ from revember_viewer_model.DTO_test import *
 from revember_viewer_msg_decoder.HeaderDecoder import *
 from revember_viewer_msg_decoder.GlobalDecoder import *
 from revember_viewer_aux.thread_interface import *
+from revember_viewer_msg_decoder.WSEQ_HelperFunctions import *
 
 import serial
 import serial.tools.list_ports
@@ -21,7 +22,7 @@ class RevemberViewerController:
         self.serial_com = serial_com
         self.connected = False
 
-        self.map_getter = MapDetailsGetter(self.model.get_obj_by_addr, self.model.get_nearest_object)
+        self.map_getter = DecoderHelperFunctions(self.model.get_obj_by_addr, self.model.get_nearest_object)
         self.decoder = GenericDataDecoder(self.map_getter, user_handlers)
         self.reader = HeaderDecoder(self.serial_com)
 

@@ -4,26 +4,6 @@ from revember_viewer_msg_decoder.TEXT_msg_decoder import *
 from revember_viewer_msg_decoder.ERROR_decoder import *
 from dataclasses import dataclass
 
-class MapDetailsGetter:
-
-    def __init__(self, decode_address, decode_LR_PC):
-        self.decode_address = decode_address
-        self.decode_LR_PC = decode_LR_PC
-
-    def decode_addr(self, address):
-        ret_val = self.decode_address(address)
-        if(ret_val != None):
-            ret_val = ret_val[0]
-        return ret_val
-    
-    def decode_LR_or_PC(self, address):
-        ret_val = self.decode_LR_PC(address)
-        if(ret_val != None):
-            ret_val = ret_val[0]
-        else:
-            print(hex(address))
-        return ret_val
-
 @dataclass
 class RevemberScenario:
     indent : int
